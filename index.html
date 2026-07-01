@@ -167,6 +167,24 @@ body.admin-on .card-edit{display:flex}
   padding:6px 16px;border-radius:3px;cursor:pointer;font-size:13px}
 .admin-ok{background:var(--ink);color:var(--white);border-color:var(--ink)}
 
+/* ── VÉRIFICATION ── */
+.card-ver-badge{display:none;position:absolute;top:8px;left:8px;width:22px;height:22px;
+  border-radius:50%;background:#2a7a3b;color:#fff;font-size:10px;font-weight:700;
+  align-items:center;justify-content:center;z-index:2}
+body.admin-on .card.verified .card-ver-badge{display:flex}
+.card-verify{display:none;font-size:10px;color:var(--light);background:none;
+  border:1px solid var(--rule);border-radius:3px;padding:2px 8px;cursor:pointer;
+  margin-top:6px;transition:all .15s;text-align:left}
+body.admin-on .card-verify{display:inline-block}
+.card-verify:hover{background:#2a7a3b;color:#fff;border-color:#2a7a3b}
+body.admin-on .card.verified .card-verify{color:#2a7a3b;border-color:#2a7a3b;background:#f0fff4}
+body.hide-verified .card.verified{display:none}
+.hide-ver-btn{font-size:11px;color:var(--mid);cursor:pointer;white-space:nowrap;
+  padding:1px 8px;border:1px solid var(--rule);border-radius:10px}
+.hide-ver-btn.on{color:#2a7a3b;border-color:#2a7a3b;background:#f0fff4;font-weight:500}
+.admin-only{display:none}
+body.admin-on .admin-only{display:inline}
+
 /* ── RESPONSIVE — @media natifs (pas de Caja ici) ── */
 @media (max-width:800px){
   .topbar{padding:12px 16px}
@@ -252,6 +270,7 @@ body.admin-on .card-edit{display:flex}
     <div class="filter-meta">
       <span id="filter-count"></span>
       <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn">Effacer les filtres</span>
+      <span class="hide-ver-btn admin-only" id="hide-ver-btn" onclick="toggleHideVerified()">👁 Masquer vérifiés</span>
     </div>
   </div>
   <div class="gallery-view active" id="gallery">
@@ -270,7 +289,8 @@ body.admin-on .card-edit{display:flex}
    CORPUS SERRALTA — GitHub Pages standalone
    Modifier API_URL après chaque nouveau déploiement Apps Script
    ================================================================ */
-var API_URL = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec?api=1';
+var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
+var API_URL  = API_BASE + '?api=1';
 
 var ITEMS    = [];
 var SHEET_ID = '';
@@ -278,6 +298,7 @@ var GID      = '';
 var activeYears  = {};
 var activeSeries = {};
 var searchQuery  = '';
+var hideVerified = false;
 var ADMIN_PASSWORD = 'serralta2026';
 var adminMode = false;
 
@@ -305,7 +326,7 @@ function startApp() {
       if (msg) msg.textContent = 'Chargement de ' + resp.items.length + ' œuvres…';
       ITEMS = resp.items.map(function(a) {
         return {ref:a[0],annee:a[1],technique:a[2],support:a[3],
-                serie:a[4],ico:a[5],crit:a[6],image_url:a[7],_row:a[8]};
+                serie:a[4],ico:a[5],crit:a[6],image_url:a[7],_row:a[8],verifie:a[9]||''};
       });
       SHEET_ID = resp.sheetId;
       GID      = resp.gid;
@@ -575,12 +596,48 @@ function goToTab(tab) {
 }
 
 /* ── Render ── */
+function toggleHideVerified() {
+  hideVerified = !hideVerified;
+  document.body.classList.toggle('hide-verified', hideVerified);
+  var btn = document.getElementById('hide-ver-btn');
+  if (btn) btn.className = 'hide-ver-btn admin-only' + (hideVerified ? ' on' : '');
+  renderGallery();
+}
+
+function verifyItem(row, btn) {
+  var wasVerified = btn.parentElement.classList.contains('verified') ||
+    (btn.parentElement.parentElement && btn.parentElement.parentElement.classList.contains('verified'));
+  btn.textContent = '…'; btn.disabled = true;
+  var url = API_BASE + '?action=verify&token=' + ADMIN_PASSWORD + '&row=' + row;
+  fetch(url)
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      if (!data.ok) { btn.textContent = 'Erreur'; btn.disabled = false; return; }
+      for (var i=0; i<ITEMS.length; i++) {
+        if (ITEMS[i]._row === row) { ITEMS[i].verifie = data.verifie; break; }
+      }
+      var card = btn;
+      while (card && !card.classList.contains('card')) card = card.parentElement;
+      if (card) {
+        if (data.verifie) { card.classList.add('verified'); }
+        else              { card.classList.remove('verified'); }
+        if (hideVerified && data.verifie) card.style.display = 'none';
+      }
+      btn.textContent = data.verifie ? '✓ Vérifié' : 'Vérifier';
+      btn.disabled = false;
+      var f = filterItems();
+      document.getElementById('filter-count').textContent = f.length + ' / ' + ITEMS.length + ' œuvres';
+    })
+    .catch(function(){ btn.textContent = 'Erreur'; btn.disabled = false; });
+}
+
 function filterItems() {
   var noYear=!sSize(activeYears), noSerie=!sSize(activeSeries), noSearch=!searchQuery;
-  if (noYear&&noSerie&&noSearch) return ITEMS;
+  if (noYear&&noSerie&&noSearch&&!hideVerified) return ITEMS;
   var result=[], i, j, tags;
   for (i=0; i<ITEMS.length; i++) {
     var it=ITEMS[i];
+    if (hideVerified && it.verifie) continue;
     var yearOk = noYear||sHas(activeYears,String(it.annee));
     tags=(it.serie||'').split('|');
     var serieOk=noSerie;
@@ -610,8 +667,10 @@ function renderGallery() {
     var tech=[it.technique,it.support].filter(Boolean).join(' / ');
     var editUrl='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/edit#gid='+GID+'&range=A'+it._row;
     var imgSafe=(it.image_url||'').replace(/'/g,'&#39;');
-    var card=document.createElement('div'); card.className='card';
-    var html='<div class="card-img"><img src="'+(it.image_url||'')+'" alt="'+esc(it.ref)+'"' +
+    var card=document.createElement('div');
+    card.className='card'+(it.verifie?' verified':'');
+    var html='<div class="card-ver-badge">✓</div>' +
+      '<div class="card-img"><img src="'+(it.image_url||'')+'" alt="'+esc(it.ref)+'"' +
       ' onerror="this.style.display=\'none\'" onclick="openLB(\''+imgSafe+'\')"></div>' +
       '<a class="card-edit" href="javascript:void(0)"' +
       ' onclick="window.open(\''+editUrl+'\',\'_blank\');return false;" title="Modifier dans Sheets">✎</a>' +
@@ -620,6 +679,7 @@ function renderGallery() {
     if(tech)    html+='<div class="card-tech">'+esc(tech)+'</div>';
     if(it.ico)  html+='<p class="card-ico">'+esc(it.ico)+'</p>';
     if(it.crit) html+='<p class="card-crit">'+esc(it.crit)+'</p>';
+    html+='<button class="card-verify" onclick="verifyItem('+it._row+',this)">'+(it.verifie?'✓ Vérifié':'Vérifier')+'</button>';
     html+='</div>';
     card.innerHTML=html; grid.appendChild(card);
   }

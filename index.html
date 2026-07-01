@@ -605,30 +605,31 @@ function toggleHideVerified() {
 }
 
 function verifyItem(row, btn) {
-  var wasVerified = btn.parentElement.classList.contains('verified') ||
-    (btn.parentElement.parentElement && btn.parentElement.parentElement.classList.contains('verified'));
   btn.textContent = '…'; btn.disabled = true;
-  var url = API_BASE + '?action=verify&token=' + ADMIN_PASSWORD + '&row=' + row;
-  fetch(url)
-    .then(function(r){ return r.json(); })
-    .then(function(data){
-      if (!data.ok) { btn.textContent = 'Erreur'; btn.disabled = false; return; }
-      for (var i=0; i<ITEMS.length; i++) {
-        if (ITEMS[i]._row === row) { ITEMS[i].verifie = data.verifie; break; }
-      }
-      var card = btn;
-      while (card && !card.classList.contains('card')) card = card.parentElement;
-      if (card) {
-        if (data.verifie) { card.classList.add('verified'); }
-        else              { card.classList.remove('verified'); }
-        if (hideVerified && data.verifie) card.style.display = 'none';
-      }
-      btn.textContent = data.verifie ? '✓ Vérifié' : 'Vérifier';
-      btn.disabled = false;
-      var f = filterItems();
-      document.getElementById('filter-count').textContent = f.length + ' / ' + ITEMS.length + ' œuvres';
-    })
-    .catch(function(){ btn.textContent = 'Erreur'; btn.disabled = false; });
+  var cbName = '_vc' + row + '_' + Date.now();
+  var script = document.createElement('script');
+  window[cbName] = function(data) {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (!data.ok) { btn.textContent = 'Erreur'; btn.disabled = false; return; }
+    for (var i=0; i<ITEMS.length; i++) {
+      if (ITEMS[i]._row === row) { ITEMS[i].verifie = data.verifie; break; }
+    }
+    var card = btn;
+    while (card && !card.classList.contains('card')) card = card.parentElement;
+    if (card) {
+      if (data.verifie) { card.classList.add('verified'); }
+      else              { card.classList.remove('verified'); }
+      if (hideVerified && data.verifie) card.style.display = 'none';
+    }
+    btn.textContent = data.verifie ? 'Déjà vérifié' : 'À vérifier';
+    btn.disabled = false;
+    var f = filterItems();
+    document.getElementById('filter-count').textContent = f.length + ' / ' + ITEMS.length + ' œuvres';
+  };
+  script.onerror = function() { btn.textContent = 'Erreur'; btn.disabled = false; };
+  script.src = API_BASE + '?action=verify&token=' + ADMIN_PASSWORD + '&row=' + row + '&callback=' + cbName;
+  document.head.appendChild(script);
 }
 
 function filterItems() {
@@ -679,7 +680,7 @@ function renderGallery() {
     if(tech)    html+='<div class="card-tech">'+esc(tech)+'</div>';
     if(it.ico)  html+='<p class="card-ico">'+esc(it.ico)+'</p>';
     if(it.crit) html+='<p class="card-crit">'+esc(it.crit)+'</p>';
-    html+='<button class="card-verify" onclick="verifyItem('+it._row+',this)">'+(it.verifie?'✓ Vérifié':'Vérifier')+'</button>';
+    html+='<button class="card-verify" onclick="verifyItem('+it._row+',this)">'+(it.verifie?'Déjà vérifié':'À vérifier')+'</button>';
     html+='</div>';
     card.innerHTML=html; grid.appendChild(card);
   }

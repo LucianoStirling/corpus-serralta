@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Corpus Serralta</title>
+<style>
+/* ─────────────────────────────────────────────────────────────
+   CORPUS SERRALTA — version GitHub Pages
+   Données via fetch() depuis Apps Script JSON API (?api=1)
+   Pas de Caja, @media natifs, responsive standard
+───────────────────────────────────────────────────────────── */
+:root{
+  --ink:#1a1a1a;--mid:#555;--light:#999;--rule:#e8e8e6;
+  --bg:#f7f7f5;--white:#fff;--accent:#c8a96e;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink)}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;
+  padding:16px 32px;background:var(--white);border-bottom:1px solid var(--rule);
+  position:sticky;top:0;z-index:20}
+.topbar-title{font-size:18px;font-weight:300;letter-spacing:-.3px;cursor:pointer}
+.topbar-count{font-size:12px;color:var(--light);margin-left:12px}
+.topbar-nav{font-size:13px;color:var(--mid);cursor:pointer;transition:color .15s}
+.topbar-nav:hover{color:var(--ink)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:0;border-bottom:2px solid var(--rule);
+  padding:0 32px;background:var(--white);position:sticky;top:57px;z-index:19}
+.tab{padding:14px 24px;font-size:13px;cursor:pointer;color:var(--light);
+  border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tab.active{color:var(--ink);border-color:var(--ink);font-weight:500}
+
+/* ── ENTRY VIEWS ── */
+.entry-view{padding:40px 32px}
+
+/* ── CONTEXT ── */
+.ctx-label{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--light);margin-bottom:32px}
+.ctx-divider{border:none;border-top:1px solid var(--rule);margin:40px 0 32px}
+.ctx-subtitle{font-size:13px;color:var(--light);margin-bottom:20px;letter-spacing:.3px}
+
+/* ── CHRONO LAYOUT ── */
+.chrono-layout{display:grid;grid-template-columns:440px 1fr;gap:40px;align-items:start}
+.chrono-bio{position:sticky;top:110px}
+.bio-img-wrap{cursor:zoom-in;margin-bottom:12px;border:1px solid var(--rule)}
+.bio-img-wrap img{width:100%;display:block}
+.bio-placeholder{width:100%;aspect-ratio:3/4;background:var(--rule);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--light);text-align:center;padding:16px;line-height:1.5}
+.bio-caption{font-size:10px;color:var(--light);font-style:italic;line-height:1.5}
+
+/* ── PERIODS ── */
+.period-list{margin-bottom:0}
+.period-row{display:grid;grid-template-columns:130px 1fr;gap:32px;
+  padding:22px 0;border-bottom:1px solid var(--rule);cursor:pointer;transition:background .12s}
+.period-row:first-child{border-top:1px solid var(--rule)}
+.period-row:hover{background:rgba(0,0,0,.02)}
+.period-date{font-size:12px;color:var(--light);padding-top:3px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.period-title{font-size:15px;font-weight:500;margin-bottom:6px;letter-spacing:-.2px}
+.period-desc{font-size:13px;color:var(--mid);line-height:1.75}
+.period-count{font-size:11px;color:var(--accent);margin-top:6px}
+
+/* ── SERIES MAJOR ── */
+.series-major-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));
+  gap:1px;background:var(--rule);margin-bottom:2px}
+.smc{background:var(--white);padding:22px 20px;cursor:pointer;transition:background .12s}
+.smc:hover{background:var(--bg)}
+.smc-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.smc-n{font-size:38px;font-weight:300;color:var(--accent);line-height:1.1;
+  margin-bottom:8px;font-variant-numeric:tabular-nums}
+.smc-desc{font-size:12px;color:var(--mid);line-height:1.65}
+
+/* ── ALL SERIES ── */
+.series-all-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.entry-card{background:var(--white);border:1px solid var(--rule);border-radius:3px;
+  padding:20px;cursor:pointer;transition:all .15s;text-align:center}
+.entry-card:hover{border-color:var(--ink);transform:translateY(-2px)}
+.entry-card-title{font-size:16px;font-weight:300;margin-bottom:4px}
+.entry-card-count{font-size:12px;color:var(--light)}
+.entry-card-desc{font-size:11px;color:var(--light);line-height:1.5;margin-top:8px;text-align:left}
+
+/* ── FILTERS ── */
+.filters{padding:8px 32px;background:var(--white);border-bottom:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:5px;position:sticky;top:57px;z-index:18}
+.filter-row{display:flex;align-items:center;gap:8px;min-width:0}
+.filter-chips-scroll{display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;
+  scrollbar-width:none;-ms-overflow-style:none;padding-bottom:1px;min-width:0}
+.filter-chips-scroll::-webkit-scrollbar{display:none}
+.filter-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--light);
+  white-space:nowrap;flex-shrink:0;width:46px}
+.chip{font-size:11px;padding:4px 12px;border:1px solid var(--rule);border-radius:20px;
+  cursor:pointer;background:var(--white);color:var(--mid);transition:all .15s;white-space:nowrap;
+  flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.chip:hover{border-color:var(--mid)}
+.chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.filter-search-row{display:flex;align-items:center;gap:8px;padding:2px 0}
+.filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
+  padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
+  background:var(--white);outline:none;transition:border-color .15s;min-width:0}
+.filter-search:focus{border-color:var(--mid)}
+.filter-search::placeholder{color:var(--light)}
+.filter-meta{display:flex;align-items:center;gap:12px;padding:2px 0 4px}
+#filter-count{font-size:11px;color:var(--light)}
+.clear-btn{font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;white-space:nowrap}
+
+/* ── GALLERY ── */
+.gallery-view{display:none}
+.gallery-view.active{display:block}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;padding:2px}
+.card{background:var(--white);display:flex;flex-direction:column;position:relative}
+.card-img{overflow:hidden;background:#f0f0ee;cursor:zoom-in}
+.card-img img{width:100%;display:block;transition:opacity .2s;aspect-ratio:auto}
+.card-img img:hover{opacity:.9}
+.card-body{padding:14px;flex:1;display:flex;flex-direction:column;gap:6px}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10px;padding:2px 8px;border-radius:12px;background:#f0f0ec;color:var(--mid);
+  cursor:pointer;transition:background .1s}
+.tag:hover{background:#e0e0db}
+.card-ref{font-size:12px;font-weight:600}
+.card-tech{font-size:11px;color:var(--light)}
+.card-ico{font-size:12px;color:var(--mid);line-height:1.6;font-family:Georgia,serif}
+.card-crit{font-size:11px;color:var(--light);line-height:1.6;font-style:italic;
+  font-family:Georgia,serif;border-top:1px solid var(--rule);padding-top:6px;margin-top:2px}
+.card-edit{position:absolute;top:8px;right:8px;width:26px;height:26px;border-radius:50%;
+  background:rgba(255,255,255,.9);border:1px solid var(--rule);cursor:pointer;
+  align-items:center;justify-content:center;font-size:12px;color:var(--mid);
+  text-decoration:none;display:none}
+body.admin-on .card-edit{display:flex}
+.card-edit:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;
+  align-items:center;justify-content:center}
+#lb.open{display:flex}
+#lb img{max-width:90vw;max-height:90vh;object-fit:contain}
+#lb-close{position:fixed;top:18px;right:22px;color:#888;font-size:26px;
+  cursor:pointer;background:none;border:none}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;z-index:200}
+.spinner{width:32px;height:32px;border:2px solid var(--rule);
+  border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading p{font-size:13px;color:var(--light)}
+#loading small{font-size:10px;color:#bbb;margin-top:8px}
+.err-msg{color:#c00;font-size:13px;max-width:400px;text-align:center;line-height:1.6}
+
+/* ── ADMIN ── */
+.lock-btn{background:none;border:none;cursor:pointer;font-size:16px;padding:0 0 0 16px;
+  opacity:.4;transition:opacity .2s;line-height:1}
+.lock-btn:hover,.lock-btn.unlocked{opacity:1}
+.lock-btn.unlocked{filter:sepia(1) saturate(3) hue-rotate(90deg)}
+.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:flex;align-items:center;justify-content:center}
+.admin-box{background:var(--white);border:1px solid var(--rule);border-radius:4px;
+  padding:28px 32px;width:280px;max-width:90vw}
+.admin-title{font-size:14px;font-weight:400;margin-bottom:16px}
+.admin-input{width:100%;border:1px solid var(--rule);border-radius:3px;
+  padding:8px 10px;font-size:14px;outline:none;box-sizing:border-box}
+.admin-input:focus{border-color:var(--ink)}
+.admin-err{font-size:12px;color:#c00;min-height:18px;margin-top:6px}
+.admin-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.admin-cancel,.admin-ok{border:1px solid var(--rule);background:none;
+  padding:6px 16px;border-radius:3px;cursor:pointer;font-size:13px}
+.admin-ok{background:var(--ink);color:var(--white);border-color:var(--ink)}
+
+/* ── RESPONSIVE — @media natifs (pas de Caja ici) ── */
+@media (max-width:800px){
+  .topbar{padding:12px 16px}
+  .topbar-title{font-size:17px}
+  .topbar-count{font-size:12px}
+  .tabs{padding:0 16px;top:53px}
+  .tab{padding:12px 16px;font-size:13px}
+  .filters{padding:6px 16px;top:53px}
+  .filter-label{width:42px;font-size:10px}
+  .chip{font-size:12px;padding:5px 10px}
+  .entry-view{padding:28px 16px}
+  .chrono-layout{grid-template-columns:1fr;gap:24px}
+  .chrono-bio{position:static}
+  .bio-img-wrap img{max-height:65vw;object-fit:contain}
+  .series-major-grid{grid-template-columns:repeat(2,1fr)}
+  .series-all-grid{grid-template-columns:repeat(2,1fr)}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .period-row{gap:16px}
+  .period-date{min-width:80px}
+}
+@media (max-width:480px){
+  .grid{grid-template-columns:1fr}
+  .series-major-grid{grid-template-columns:1fr}
+  .series-all-grid{grid-template-columns:1fr}
+  .chrono-layout{grid-template-columns:1fr}
+  .chip{font-size:13px;padding:6px 12px;min-height:36px}
+  .filter-search{font-size:14px}
+  .card-ref{font-size:14px}
+  .card-tech,.card-ico{font-size:13px}
+  .period-title{font-size:16px}
+  .period-desc{font-size:13px}
+  .topbar-nav{display:none} /* trop étroit, nav par onglets suffit */
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p id="load-msg">Chargement du corpus&#8230;</p>
+  <small id="load-sub"></small>
+</div>
+
+<div class="topbar" style="display:none" id="topbar">
+  <div style="display:flex;align-items:baseline;gap:8px">
+    <span class="topbar-title" onclick="goToTab('chrono')">Corpus Serralta</span>
+    <span class="topbar-count" id="main-count"></span>
+  </div>
+  <div style="display:flex;gap:20px;align-items:center">
+    <span class="topbar-nav" onclick="goToTab('chrono')">Chronologie</span>
+    <span class="topbar-nav" onclick="goToTab('series')">S&#233;ries</span>
+    <button class="lock-btn" id="lock-btn" onclick="toggleAdmin()" title="Administration">&#128274;</button>
+  </div>
+</div>
+
+<!-- ENTRY PAGE -->
+<div id="entry-page" style="display:none">
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('chrono')">Chronologie</div>
+    <div class="tab" onclick="switchTab('series')">S&#233;ries</div>
+  </div>
+  <div class="entry-view" id="chrono-view"></div>
+  <div class="entry-view" id="series-view" style="display:none"></div>
+</div>
+
+<!-- GALLERY PAGE -->
+<div id="gallery-page" style="display:none">
+  <div class="filters" id="filter-bar">
+    <div class="filter-row">
+      <span class="filter-label">Ann&#233;es</span>
+      <div class="filter-chips-scroll" id="year-chips"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">S&#233;ries</span>
+      <div class="filter-chips-scroll" id="serie-chips"></div>
+    </div>
+    <div class="filter-search-row">
+      <span class="filter-label">Texte</span>
+      <input class="filter-search" id="search-input" type="text"
+        placeholder="Rechercher dans les descriptions, s&#233;ries, r&#233;f&#233;rences&#8230;"
+        oninput="onSearch(this.value)">
+    </div>
+    <div class="filter-meta">
+      <span id="filter-count"></span>
+      <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn">Effacer les filtres</span>
+    </div>
+  </div>
+  <div class="gallery-view active" id="gallery">
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <img id="lb-img" src="" alt="">
+  <button id="lb-close" onclick="closeLB()">&#x2715;</button>
+</div>
+
+<script>
+/* ================================================================
+   CORPUS SERRALTA — GitHub Pages standalone
+   Modifier API_URL après chaque nouveau déploiement Apps Script
+   ================================================================ */
+var API_URL = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec?api=1';
+
+var ITEMS    = [];
+var SHEET_ID = '';
+var GID      = '';
+var activeYears  = {};
+var activeSeries = {};
+var searchQuery  = '';
+var ADMIN_PASSWORD = 'serralta2026';
+var adminMode = false;
+
+/* ── Helpers ── */
+function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
+function sAdd(o,k){o[String(k)]=true}
+function sDel(o,k){delete o[String(k)]}
+function sSize(o){return Object.keys(o).length}
+function sClear(o){var ks=Object.keys(o);for(var i=0;i<ks.length;i++)delete o[ks[i]]}
+function sFromArr(a){var o={};for(var i=0;i<a.length;i++)o[String(a[i])]=true;return o}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ── Startup — fetch JSON API ── */
+function startApp() {
+  var msg = document.getElementById('load-msg');
+  var sub = document.getElementById('load-sub');
+  if (sub) sub.textContent = 'Connexion au catalogue…';
+
+  fetch(API_URL)
+    .then(function(r) {
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      return r.json();
+    })
+    .then(function(resp) {
+      if (msg) msg.textContent = 'Chargement de ' + resp.items.length + ' œuvres…';
+      ITEMS = resp.items.map(function(a) {
+        return {ref:a[0],annee:a[1],technique:a[2],support:a[3],
+                serie:a[4],ico:a[5],crit:a[6],image_url:a[7],_row:a[8]};
+      });
+      SHEET_ID = resp.sheetId;
+      GID      = resp.gid;
+      init();
+    })
+    .catch(function(err) {
+      if (msg) {
+        msg.className = 'err-msg';
+        msg.textContent = 'Impossible de charger le catalogue.';
+      }
+      if (sub) sub.textContent = err.message + ' — Vérifier la connexion et réessayer.';
+    });
+}
+
+document.addEventListener('DOMContentLoaded', startApp);
+
+/* ── Init ── */
+function init() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('topbar').style.display  = 'flex';
+  document.getElementById('main-count').textContent = ITEMS.length + ' œuvres';
+  buildEntryPage();
+  buildFilterChips();
+  document.getElementById('entry-page').style.display = 'block';
+}
+
+/* ── Données contextuelles ── */
+var PERIODS = [
+  { date: '1969 – 1975', title: 'Les prémices',
+    years: ['1969','1974','1975'],
+    desc: 'Une seule œuvre de 1969, une poignée de 1974–75. Serralta est encore ancré dans une figuration de tradition — paysage en perspective, couleur au crayon — sans les caractéristiques formelles qui définiront sa voix propre.' },
+  { date: '1976 – 1978', title: 'L’explosion du trait',
+    years: ['1976','1977','1978'],
+    desc: 'Plus de 360 œuvres en trois ans — un rythme qui ne se reproduira jamais. Le dessin devient quotidien, urgent, compulsif. La ligne s’affermit et se libère simultanément : encre de Chine pure, feutre couleur, grands formats panoramiques. Le nu féminin s’impose comme motif central, les premières apparitions du vocabulaire UNITOR. Serralta a 57 ans, en exil à Paris depuis la dictature Bordaberry (1973).' },
+  { date: '1979 – 1982', title: 'La densité architecturale',
+    years: ['1979','1980','1981','1982'],
+    desc: 'Les corps s’enchêtrent avec les structures. Les instruments de musique deviennent des architectures, les pianistes fusionnent avec leurs claviers. La tension entre l’organique et le mécanique produit certaines des œuvres les plus conceptuellement denses du corpus.' },
+  { date: '1983 – 1984', title: 'Le retour à la couleur',
+    years: ['1983','1984'],
+    desc: 'En rupture avec la densification formelle qui précède : retour à la couleur vive et à la gestualité aquarellée. Figures équestres au trait minimal, nus dans des paysages turquoise, chevaux bondissants rouge et rose — une période de respiration chromatique.' },
+  { date: '1985 – 1986', title: 'La densification cosmique',
+    years: ['1985','1986'],
+    desc: 'Les compositions retrouvent leur densité, orientées vers le haut : visages couronnés de figures microscopiques, portraits-cosmos où l’individu porte en lui une cartographie intérieure. Le poing fermé, les regards frontaux, les réseaux géométriques superposés aux corps — la période la plus chargée psychologiquement du corpus.' },
+  { date: '1987 – 1988', title: 'Le temps des paquebots',
+    years: ['1987','1988'],
+    desc: 'Un motif nouveau envahit les compositions : le paquebot. Navires très détaillés surgissent dans des paysages de rochers et de falaises déjà habités par des nus féminins. Tension systématique entre le temps mythologique (figure, roche, lune) et le temps mécanique (navire, mouvement, destination).' },
+  { date: '1989', title: 'Le cubisme géométrique',
+    years: ['1989'],
+    desc: 'Serralta pousse la figure humaine jusqu’à sa dissolution dans la géométrie pure. Les personnages sont constitués de cubes et de polyèdres, les espaces deviennent des continuums géométriques. Le moment le plus rigoureusement abstrait d’un corpus foncièrement figuratif.' },
+  { date: '1990 – 2011', title: 'La traversée des styles',
+    years: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999',
+             '2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
+    desc: 'La production se ralentit sans s’arrêter. Deux décennies d’activité régulière, oscillant entre les thèmes fondateurs (nus, musique, UNITOR) et des expérimentations plus tardives en pastel gras ou technique mixte.' }
+];
+
+var SERIES_MAJOR = [
+  { name: 'Nus', desc: 'Motif le plus constant, présent dès 1976 et jamais abandonné. Corps multiple, frontal, intégré à la nature ou confronté à l’animal. Le nu est pour Serralta une syntaxe autant qu’un sujet.' },
+  { name: 'Animaux', desc: 'Chevaux, taureaux, oiseaux rapaces, félins. Souvent en tension ou fusion avec le nu humain. Héritiers de la tradition mythologique, réinterprétés sans narration illustrative.' },
+  { name: 'CIENS-ART', desc: 'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes d’énergie — une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.' },
+  { name: 'Musique', desc: 'Pianistes, violoncellistes, bandónistes, violonistes. Les musiciens fusionnent avec leurs instruments jusqu’à la dissolution formelle. Lien profond avec la culture rioplatense.' },
+  { name: 'Portraits', desc: 'Visages très travaillés, regards frontaux d’une intensité inhabituelle. Certains portraits-cosmos portent un univers miniaturisé au-dessus de la tête.' },
+  { name: 'Paquebot', desc: 'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement — motif autobiographique discret.' },
+  { name: 'Études', desc: 'Recherches formelles préparatoires ou autonomes : esquisses de figures, études de mains et de visages. Le laboratoire visible de la pratique de Serralta.' },
+  { name: 'Manuscrit', desc: 'Œuvres intégrant texte manuscrit — poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
+  { name: 'Diapogravure', desc: 'Technique unique : travail direct sur diapositives 35 mm. Procédé artisanal personnel sans équivalent recensé dans l’œuvre connue de Serralta.' },
+  { name: 'Dédicaces', desc: 'Œuvres offertes et dédicacées, souvent de format modeste. Révèlent le réseau amical et intellectuel de Serralta — musiciens, architectes, poètes.' },
+  { name: 'Illustrations Higinio Mena', desc: 'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena, ami de longue date. Seule collaboration éditoriale documentée de Serralta.' },
+  { name: 'Série peintures', desc: 'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.' },
+  { name: 'Sculptures', desc: 'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.' }
+];
+
+var BIO_DOC_FILE_ID = '13D9-mJlnZ9j7cfLM90yPJIzozfQSkxUH';
+
+/* ── Count helpers ── */
+function countForYears(years) {
+  var n=0;
+  for(var i=0;i<ITEMS.length;i++) if(years.indexOf(String(ITEMS[i].annee))!==-1) n++;
+  return n;
+}
+
+/* ── Build entry page ── */
+function buildEntryPage() {
+  var i, pi;
+
+  /* CHRONOLOGIE */
+  var cv = document.getElementById('chrono-view');
+  cv.innerHTML = '<p class="ctx-label">Les grandes périodes stylistiques</p>' +
+    '<div class="chrono-layout">' +
+    '<div class="chrono-bio" id="chrono-bio-col"></div>' +
+    '<div class="period-list" id="period-list"></div>' +
+    '</div>';
+
+  var bioCol = document.getElementById('chrono-bio-col');
+  if (BIO_DOC_FILE_ID) {
+    var bioUrl = 'https://lh3.googleusercontent.com/d/' + BIO_DOC_FILE_ID;
+    bioCol.innerHTML = '<div class="bio-img-wrap" onclick="openLB(\'' + bioUrl + '\')">' +
+      '<img src="' + bioUrl + '" alt="Chronologie autobiographique J. Serralta"></div>' +
+      '<p class="bio-caption">Chronologie autobiographique dessinée de la main de Serralta — âge vs année, de Melo 1919 aux années 2000. On y lit l’exil (1973), la création de CIENS-ART (1976), les années à l’École d’Architecture de Rennes. Archive familiale.</p>';
+  }
+
+  var pl = document.getElementById('period-list');
+  for (pi=0; pi<PERIODS.length; pi++) {
+    var p = PERIODS[pi];
+    var cnt = countForYears(p.years);
+    if (!cnt) continue;
+    var row = document.createElement('div');
+    row.className = 'period-row';
+    row.innerHTML = '<div class="period-date">' + p.date + '</div>' +
+      '<div><div class="period-title">' + p.title + '</div>' +
+      '<div class="period-desc">' + p.desc + '</div>' +
+      '<div class="period-count">' + cnt + ' œuvres</div></div>';
+    (function(yrs){ row.onclick = function(){ openGallery(yrs,[]); }; })(p.years);
+    pl.appendChild(row);
+  }
+
+  /* SÉRIES */
+  var sv = document.getElementById('series-view');
+  sv.innerHTML = '<p class="ctx-label">Les grandes séries thématiques</p>';
+
+  var descMap = {};
+  for (i=0; i<SERIES_MAJOR.length; i++) descMap[SERIES_MAJOR[i].name] = SERIES_MAJOR[i].desc;
+
+  /* Top 5 dynamique */
+  var scountTop = {};
+  for (i=0; i<ITEMS.length; i++) {
+    var pts = (ITEMS[i].serie||'').split('|');
+    for (var j=0; j<pts.length; j++) {
+      var sp = pts[j].trim();
+      if (sp) scountTop[sp] = (scountTop[sp]||0)+1;
+    }
+  }
+  var sortedTop = [];
+  for (var k in scountTop) if(sHas(scountTop,k)) sortedTop.push([k,scountTop[k]]);
+  sortedTop.sort(function(a,b){return b[1]-a[1];});
+  var top5 = sortedTop.slice(0,5);
+
+  var mg = document.createElement('div');
+  mg.className = 'series-major-grid';
+  for (i=0; i<top5.length; i++) {
+    var scard = document.createElement('div');
+    scard.className = 'smc';
+    scard.innerHTML = '<div class="smc-title">'+esc(top5[i][0])+'</div>' +
+      '<div class="smc-n">'+top5[i][1]+'</div>' +
+      '<div class="smc-desc">'+(descMap[top5[i][0]]||'')+'</div>';
+    (function(nm){ scard.onclick = function(){ openGallery([],[nm]); }; })(top5[i][0]);
+    mg.appendChild(scard);
+  }
+  sv.appendChild(mg);
+
+  var hr = document.createElement('hr'); hr.className='ctx-divider'; sv.appendChild(hr);
+  var lbl = document.createElement('p'); lbl.className='ctx-subtitle';
+  lbl.textContent='Toutes les séries'; sv.appendChild(lbl);
+
+  var scount = {};
+  for (i=0; i<ITEMS.length; i++) {
+    var parts = (ITEMS[i].serie||'').split('|');
+    for (var pi2=0; pi2<parts.length; pi2++) {
+      var s2 = parts[pi2].trim();
+      if (s2) scount[s2]=(scount[s2]||0)+1;
+    }
+  }
+  var sorted = [];
+  for (var sn in scount) if(sHas(scount,sn)) sorted.push([sn,scount[sn]]);
+  sorted.sort(function(a,b){return b[1]-a[1];});
+
+  var top5names = {};
+  for (i=0; i<top5.length; i++) top5names[top5[i][0]]=true;
+
+  var ag = document.createElement('div'); ag.className='series-all-grid';
+  for (var sri=0; sri<sorted.length; sri++) {
+    var snm=sorted[sri][0], scnt=sorted[sri][1];
+    if (top5names[snm]) continue;
+    var ac = document.createElement('div'); ac.className='entry-card';
+    ac.innerHTML = '<div class="entry-card-title">'+esc(snm)+'</div>' +
+      '<div class="entry-card-count">'+scnt+' œuvres</div>' +
+      (descMap[snm]?'<div class="entry-card-desc">'+descMap[snm]+'</div>':'');
+    (function(nm){ ac.onclick = function(){ openGallery([],[nm]); }; })(snm);
+    ag.appendChild(ac);
+  }
+  sv.appendChild(ag);
+}
+
+function switchTab(tab) {
+  var tabs = document.querySelectorAll('.tab');
+  for (var i=0; i<tabs.length; i++) {
+    tabs[i].className = ((tab==='chrono'&&i===0)||(tab==='series'&&i===1)) ? 'tab active' : 'tab';
+  }
+  document.getElementById('chrono-view').style.display = tab==='chrono'?'block':'none';
+  document.getElementById('series-view').style.display = tab==='series'?'block':'none';
+}
+
+/* ── Filter chips ── */
+function buildFilterChips() {
+  var i, ymap={}, years=[];
+  for (i=0; i<ITEMS.length; i++) {
+    var yr=String(ITEMS[i].annee);
+    if (!ymap[yr]) { ymap[yr]=true; years.push(yr); }
+  }
+  years.sort();
+  var yc = document.getElementById('year-chips');
+  for (i=0; i<years.length; i++) {
+    var yb = document.createElement('button');
+    yb.className='chip'; yb.setAttribute('data-y',years[i]); yb.textContent=years[i];
+    (function(y,b){ b.onclick=function(){ toggleYear(y,b); }; })(years[i],yb);
+    yc.appendChild(yb);
+  }
+  var smap={}, skeys=[];
+  for (i=0; i<ITEMS.length; i++) {
+    var pts=(ITEMS[i].serie||'').split('|');
+    for (var j=0; j<pts.length; j++) {
+      var sv2=pts[j].trim();
+      if (sv2&&!smap[sv2]) { smap[sv2]=true; skeys.push(sv2); }
+    }
+  }
+  skeys.sort();
+  var sc = document.getElementById('serie-chips');
+  for (i=0; i<skeys.length; i++) {
+    var sb = document.createElement('button');
+    sb.className='chip'; sb.setAttribute('data-s',skeys[i]); sb.textContent=skeys[i];
+    (function(s,b){ b.onclick=function(){ toggleSerie(s,b); }; })(skeys[i],sb);
+    sc.appendChild(sb);
+  }
+}
+
+function toggleYear(y,btn) {
+  if (sHas(activeYears,y)){sDel(activeYears,y);btn.className='chip';}
+  else{sAdd(activeYears,y);btn.className='chip active';}
+  enforceMinFilter(); renderGallery();
+}
+function toggleSerie(s,btn) {
+  if (sHas(activeSeries,s)){sDel(activeSeries,s);btn.className='chip';}
+  else{sAdd(activeSeries,s);btn.className='chip active';}
+  enforceMinFilter(); renderGallery();
+}
+function enforceMinFilter() {
+  var active = sSize(activeYears)>0||sSize(activeSeries)>0||searchQuery.length>0;
+  document.getElementById('clear-btn').style.display = active?'inline':'none';
+}
+function onSearch(val) { searchQuery=val.trim().toLowerCase(); enforceMinFilter(); renderGallery(); }
+function clearFilters() {
+  sClear(activeYears); sClear(activeSeries); searchQuery='';
+  var si=document.getElementById('search-input'); if(si) si.value='';
+  document.querySelectorAll('.chip').forEach(function(c){c.className='chip';});
+  enforceMinFilter(); renderGallery();
+}
+
+/* ── Navigation ── */
+function openGallery(years, series) {
+  document.getElementById('entry-page').style.display='none';
+  document.getElementById('gallery-page').style.display='block';
+  window.scrollTo(0,0);
+  activeYears=sFromArr(years); activeSeries=sFromArr(series);
+  document.querySelectorAll('#year-chips .chip').forEach(function(c){
+    c.className=sHas(activeYears,c.getAttribute('data-y'))?'chip active':'chip';
+  });
+  document.querySelectorAll('#serie-chips .chip').forEach(function(c){
+    c.className=sHas(activeSeries,c.getAttribute('data-s'))?'chip active':'chip';
+  });
+  enforceMinFilter(); renderGallery();
+}
+function goToTab(tab) {
+  document.getElementById('gallery-page').style.display='none';
+  document.getElementById('entry-page').style.display='block';
+  sClear(activeYears); sClear(activeSeries);
+  document.querySelectorAll('.chip').forEach(function(c){c.className='chip';});
+  switchTab(tab); window.scrollTo(0,0);
+}
+
+/* ── Render ── */
+function filterItems() {
+  var noYear=!sSize(activeYears), noSerie=!sSize(activeSeries), noSearch=!searchQuery;
+  if (noYear&&noSerie&&noSearch) return ITEMS;
+  var result=[], i, j, tags;
+  for (i=0; i<ITEMS.length; i++) {
+    var it=ITEMS[i];
+    var yearOk = noYear||sHas(activeYears,String(it.annee));
+    tags=(it.serie||'').split('|');
+    var serieOk=noSerie;
+    if (!serieOk) for(j=0;j<tags.length;j++) if(sHas(activeSeries,tags[j].trim())){serieOk=true;break;}
+    var textOk=noSearch;
+    if (!textOk) {
+      var h=[it.ref,it.serie,it.ico,it.crit,it.technique,it.support].join(' ').toLowerCase();
+      textOk=h.indexOf(searchQuery)!==-1;
+    }
+    if (yearOk&&serieOk&&textOk) result.push(it);
+  }
+  return result;
+}
+
+function renderGallery() {
+  var filtered=filterItems();
+  document.getElementById('filter-count').textContent=filtered.length+' / '+ITEMS.length+' œuvres';
+  var grid=document.getElementById('grid'); grid.innerHTML='';
+  for (var i=0; i<filtered.length; i++) {
+    var it=filtered[i];
+    var tags=(it.serie||'').split('|');
+    var tagsHtml='';
+    for (var j=0; j<tags.length; j++) {
+      var t=tags[j].trim();
+      if(t) tagsHtml+='<span class="tag" onclick="addSerieFilter(\''+esc(t)+'\')">'+esc(t)+'</span>';
+    }
+    var tech=[it.technique,it.support].filter(Boolean).join(' / ');
+    var editUrl='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/edit#gid='+GID+'&range=A'+it._row;
+    var imgSafe=(it.image_url||'').replace(/'/g,'&#39;');
+    var card=document.createElement('div'); card.className='card';
+    var html='<div class="card-img"><img src="'+(it.image_url||'')+'" alt="'+esc(it.ref)+'"' +
+      ' onerror="this.style.display=\'none\'" onclick="openLB(\''+imgSafe+'\')"></div>' +
+      '<a class="card-edit" href="javascript:void(0)"' +
+      ' onclick="window.open(\''+editUrl+'\',\'_blank\');return false;" title="Modifier dans Sheets">✎</a>' +
+      '<div class="card-body"><div class="card-tags">'+tagsHtml+'</div>' +
+      '<div class="card-ref">'+esc(it.ref)+'</div>';
+    if(tech)    html+='<div class="card-tech">'+esc(tech)+'</div>';
+    if(it.ico)  html+='<p class="card-ico">'+esc(it.ico)+'</p>';
+    if(it.crit) html+='<p class="card-crit">'+esc(it.crit)+'</p>';
+    html+='</div>';
+    card.innerHTML=html; grid.appendChild(card);
+  }
+}
+
+function addSerieFilter(s) {
+  sAdd(activeSeries,s);
+  document.querySelectorAll('#serie-chips .chip').forEach(function(c){
+    if(c.getAttribute('data-s')===s) c.className='chip active';
+  });
+  enforceMinFilter(); renderGallery();
+}
+
+/* ── Lightbox ── */
+function openLB(src) {
+  if(!src) return;
+  document.getElementById('lb-img').src=src;
+  document.getElementById('lb').className='open';
+  document.body.style.overflow='hidden';
+}
+function closeLB() {
+  document.getElementById('lb').className='';
+  document.body.style.overflow='';
+}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')closeLB();});
+document.getElementById('lb').addEventListener('click',function(e){
+  if(e.target===document.getElementById('lb')) closeLB();
+});
+
+/* ── Admin ── */
+function toggleAdmin() {
+  if (adminMode) {
+    adminMode=false;
+    document.body.classList.remove('admin-on');
+    document.getElementById('lock-btn').classList.remove('unlocked');
+  } else {
+    document.getElementById('admin-pwd').value='';
+    document.getElementById('admin-err').textContent='';
+    document.getElementById('admin-modal').style.display='flex';
+    setTimeout(function(){document.getElementById('admin-pwd').focus();},50);
+  }
+}
+function closeAdminModal(){ document.getElementById('admin-modal').style.display='none'; }
+function checkAdmin() {
+  if (document.getElementById('admin-pwd').value===ADMIN_PASSWORD) {
+    adminMode=true;
+    document.body.classList.add('admin-on');
+    document.getElementById('lock-btn').classList.add('unlocked');
+    closeAdminModal();
+  } else {
+    document.getElementById('admin-err').textContent='Mot de passe incorrect';
+    document.getElementById('admin-pwd').value='';
+    document.getElementById('admin-pwd').focus();
+  }
+}
+</script>
+
+<div id="admin-modal" class="admin-overlay" style="display:none">
+  <div class="admin-box">
+    <div class="admin-title">Administration</div>
+    <input type="password" id="admin-pwd" class="admin-input" placeholder="Mot de passe"
+      onkeydown="if(event.key==='Enter')checkAdmin()">
+    <div id="admin-err" class="admin-err"></div>
+    <div class="admin-btns">
+      <button class="admin-cancel" onclick="closeAdminModal()">Annuler</button>
+      <button class="admin-ok" onclick="checkAdmin()">Valider</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

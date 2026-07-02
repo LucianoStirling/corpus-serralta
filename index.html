@@ -4,8 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Corpus Serralta</title>
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon.ico">
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
 /* ─────────────────────────────────────────────────────────────
    CORPUS SERRALTA — version GitHub Pages
@@ -184,6 +183,7 @@ body.hide-verified .card.verified{display:none}
 .hide-ver-btn{font-size:11px;color:var(--mid);cursor:pointer;white-space:nowrap;
   padding:1px 8px;border:1px solid var(--rule);border-radius:10px}
 .hide-ver-btn.on{color:#2a7a3b;border-color:#2a7a3b;background:#f0fff4;font-weight:500}
+.ver-count{font-size:11px;color:#2a7a3b;white-space:nowrap}
 .admin-only{display:none}
 body.admin-on .admin-only{display:inline}
 
@@ -273,6 +273,7 @@ body.admin-on .admin-only{display:inline}
       <span id="filter-count"></span>
       <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn">Effacer les filtres</span>
       <span class="hide-ver-btn admin-only" id="hide-ver-btn" onclick="toggleHideVerified()">👁 Masquer vérifiés</span>
+      <span class="ver-count admin-only" id="ver-count"></span>
     </div>
   </div>
   <div class="gallery-view active" id="gallery">
@@ -658,6 +659,8 @@ function filterItems() {
 function renderGallery() {
   var filtered=filterItems();
   document.getElementById('filter-count').textContent=filtered.length+' / '+ITEMS.length+' œuvres';
+  var nVer=0; for(var vi=0;vi<ITEMS.length;vi++) if(ITEMS[vi].verifie) nVer++;
+  var vc=document.getElementById('ver-count'); if(vc) vc.textContent=nVer+' / '+ITEMS.length+' vérifiés';
   var grid=document.getElementById('grid'); grid.innerHTML='';
   for (var i=0; i<filtered.length; i++) {
     var it=filtered[i];

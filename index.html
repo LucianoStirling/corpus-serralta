@@ -177,8 +177,11 @@ body.admin-on .card.verified .card-ver-badge{display:flex}
   border:1px solid var(--rule);border-radius:3px;padding:2px 8px;cursor:pointer;
   margin-top:6px;transition:all .15s;text-align:left}
 body.admin-on .card-verify{display:inline-block}
-.card-verify:hover{background:#2a7a3b;color:#fff;border-color:#2a7a3b}
+.card-verify:hover:not(:disabled){background:#2a7a3b;color:#fff;border-color:#2a7a3b}
 body.admin-on .card.verified .card-verify{color:#2a7a3b;border-color:#2a7a3b;background:#f0fff4}
+body.admin-on .card.verified-by-me .card-verify{color:#999;border-color:#e0e0e0;background:#f8f8f8;cursor:default}
+.card-verifiers{display:none;font-size:10px;color:var(--light);margin-top:2px;line-height:1.4}
+body.admin-on .card-verifiers{display:block}
 body.hide-verified .card.verified{display:none}
 .hide-ver-btn{font-size:11px;color:var(--mid);cursor:pointer;white-space:nowrap;
   padding:1px 8px;border:1px solid var(--rule);border-radius:10px}
@@ -186,6 +189,11 @@ body.hide-verified .card.verified{display:none}
 .ver-count{font-size:11px;color:#2a7a3b;white-space:nowrap}
 .admin-only{display:none}
 body.admin-on .admin-only{display:inline}
+/* ── LEADERBOARD ── */
+.leaderboard-row{display:none;align-items:center;gap:6px;padding:3px 0 2px;flex-wrap:wrap}
+body.admin-on .leaderboard-row{display:flex}
+.lb-medal{font-size:11px;white-space:nowrap;color:var(--mid)}
+.lb-medal strong{color:var(--ink);font-weight:600}
 
 /* ── RESPONSIVE — @media natifs (pas de Caja ici) ── */
 @media (max-width:800px){
@@ -275,6 +283,7 @@ body.admin-on .admin-only{display:inline}
       <span class="hide-ver-btn admin-only" id="hide-ver-btn" onclick="toggleHideVerified()">👁 Masquer vérifiés</span>
       <span class="ver-count admin-only" id="ver-count"></span>
     </div>
+    <div class="leaderboard-row" id="leaderboard-row"></div>
   </div>
   <div class="gallery-view active" id="gallery">
     <div class="grid" id="grid"></div>
@@ -302,8 +311,9 @@ var activeYears  = {};
 var activeSeries = {};
 var searchQuery  = '';
 var hideVerified = false;
-var ADMIN_PASSWORD = 'fourchette';
-var adminMode = false;
+var ADMIN_NAME   = '';  // prénom de la personne connectée
+var adminMode    = false;
+var VALID_NAMES  = ['anita','jorge','anahi','roberto','luciano','mogdad','maora','shaima','amelle','malik','louise','alix','liza','myriam','elisabeth'];
 
 /* ── Helpers ── */
 function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
@@ -608,31 +618,68 @@ function toggleHideVerified() {
 }
 
 function verifyItem(row, btn) {
-  btn.textContent = '…'; btn.disabled = true;
-  var cbName = '_vc' + row + '_' + Date.now();
-  var script = document.createElement('script');
-  window[cbName] = function(data) {
+  if (!ADMIN_NAME) return;
+  // Déjà vérifié par moi → rien à faire
+  var item = null;
+  for (var i=0; i<ITEMS.length; i++) { if (ITEMS[i]._row===row){item=ITEMS[i];break;} }
+  if (!item) return;
+  var existing = (item.verifie||'').split(',').map(function(n){return n.trim().toLowerCase();});
+  if (existing.indexOf(ADMIN_NAME.toLowerCase())!==-1) return;
+
+  btn.textContent='…'; btn.disabled=true;
+  var cbName='_vc'+row+'_'+Date.now();
+  var script=document.createElement('script');
+  window[cbName]=function(data){
     delete window[cbName];
-    if (script.parentNode) script.parentNode.removeChild(script);
-    if (!data.ok) { btn.textContent = 'Erreur'; btn.disabled = false; return; }
-    for (var i=0; i<ITEMS.length; i++) {
-      if (ITEMS[i]._row === row) { ITEMS[i].verifie = data.verifie; break; }
+    if(script.parentNode) script.parentNode.removeChild(script);
+    if(!data.ok){btn.textContent='Erreur';btn.disabled=false;return;}
+    for(var j=0;j<ITEMS.length;j++){if(ITEMS[j]._row===row){ITEMS[j].verifie=data.verifie;break;}}
+    var card=btn;
+    while(card&&!card.classList.contains('card')) card=card.parentElement;
+    if(card){
+      card.classList.add('verified');
+      card.classList.add('verified-by-me');
+      var vEl=card.querySelector('.card-verifiers');
+      if(vEl) vEl.textContent='par '+data.verifie;
+      if(hideVerified) card.style.display='none';
     }
-    var card = btn;
-    while (card && !card.classList.contains('card')) card = card.parentElement;
-    if (card) {
-      if (data.verifie) { card.classList.add('verified'); }
-      else              { card.classList.remove('verified'); }
-      if (hideVerified && data.verifie) card.style.display = 'none';
-    }
-    btn.textContent = data.verifie ? 'Déjà vérifié' : 'À vérifier';
-    btn.disabled = false;
-    var f = filterItems();
-    document.getElementById('filter-count').textContent = f.length + ' / ' + ITEMS.length + ' œuvres';
+    btn.textContent='Déjà fait ✓'; btn.disabled=true;
+    var f=filterItems();
+    document.getElementById('filter-count').textContent=f.length+' / '+ITEMS.length+' œuvres';
+    var nVer=0; for(var vi=0;vi<ITEMS.length;vi++) if(ITEMS[vi].verifie) nVer++;
+    var vc=document.getElementById('ver-count'); if(vc) vc.textContent=nVer+' / '+ITEMS.length+' vérifiés';
+    updateLeaderboard();
   };
-  script.onerror = function() { btn.textContent = 'Erreur'; btn.disabled = false; };
-  script.src = API_BASE + '?action=verify&token=' + ADMIN_PASSWORD + '&row=' + row + '&callback=' + cbName;
+  script.onerror=function(){btn.textContent='Erreur';btn.disabled=false;};
+  script.src=API_BASE+'?action=verify&token='+encodeURIComponent(ADMIN_NAME)+'&row='+row+'&callback='+cbName;
   document.head.appendChild(script);
+}
+
+function updateLeaderboard() {
+  var scores={};
+  for(var i=0;i<ITEMS.length;i++){
+    var v=ITEMS[i].verifie||'';
+    if(!v) continue;
+    var ns=v.split(',');
+    for(var j=0;j<ns.length;j++){
+      var n=ns[j].trim();
+      if(n) scores[n]=(scores[n]||0)+1;
+    }
+  }
+  var sorted=[];
+  for(var nm in scores) if(Object.prototype.hasOwnProperty.call(scores,nm)) sorted.push([nm,scores[nm]]);
+  sorted.sort(function(a,b){return b[1]-a[1];});
+  var medals=['🥇','🥈','🥉'];
+  var row=document.getElementById('leaderboard-row');
+  if(!row) return;
+  row.innerHTML='<span style="font-size:10px;color:var(--light);white-space:nowrap;text-transform:uppercase;letter-spacing:1px">Classement :</span>';
+  for(var k=0;k<sorted.length;k++){
+    var icon=medals[k]||'·';
+    var span=document.createElement('span');
+    span.className='lb-medal';
+    span.innerHTML=icon+' '+esc(sorted[k][0])+' <strong>'+sorted[k][1]+'</strong>';
+    row.appendChild(span);
+  }
 }
 
 function filterItems() {
@@ -661,6 +708,7 @@ function renderGallery() {
   document.getElementById('filter-count').textContent=filtered.length+' / '+ITEMS.length+' œuvres';
   var nVer=0; for(var vi=0;vi<ITEMS.length;vi++) if(ITEMS[vi].verifie) nVer++;
   var vc=document.getElementById('ver-count'); if(vc) vc.textContent=nVer+' / '+ITEMS.length+' vérifiés';
+  updateLeaderboard();
   var grid=document.getElementById('grid'); grid.innerHTML='';
   for (var i=0; i<filtered.length; i++) {
     var it=filtered[i];
@@ -673,8 +721,15 @@ function renderGallery() {
     var tech=[it.technique,it.support].filter(Boolean).join(' / ');
     var editUrl='https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/edit#gid='+GID+'&range=A'+it._row;
     var imgSafe=(it.image_url||'').replace(/'/g,'&#39;');
+    // Bouton vérification
+    var verNames=(it.verifie||'').split(',').map(function(n){return n.trim();}).filter(Boolean);
+    var verByMe=ADMIN_NAME&&verNames.map(function(n){return n.toLowerCase();}).indexOf(ADMIN_NAME.toLowerCase())!==-1;
+    var isVer=verNames.length>0;
+    var btnLabel=verByMe?'Déjà fait ✓':(isVer?'Ajouter ma vérif':'À vérifier');
+    var btnDis=verByMe?' disabled':'';
+    var cardCls='card'+(isVer?' verified':'')+(verByMe?' verified-by-me':'');
     var card=document.createElement('div');
-    card.className='card'+(it.verifie?' verified':'');
+    card.className=cardCls;
     var html='<div class="card-ver-badge">✓</div>' +
       '<div class="card-img"><img src="'+(it.image_url||'')+'" alt="'+esc(it.ref)+'"' +
       ' onerror="this.style.display=\'none\'" onclick="openLB(\''+imgSafe+'\')"></div>' +
@@ -685,7 +740,8 @@ function renderGallery() {
     if(tech)    html+='<div class="card-tech">'+esc(tech)+'</div>';
     if(it.ico)  html+='<p class="card-ico">'+esc(it.ico)+'</p>';
     if(it.crit) html+='<p class="card-crit">'+esc(it.crit)+'</p>';
-    html+='<button class="card-verify" onclick="verifyItem('+it._row+',this)">'+(it.verifie?'Déjà vérifié':'À vérifier')+'</button>';
+    html+='<button class="card-verify"'+btnDis+' onclick="verifyItem('+it._row+',this)">'+btnLabel+'</button>';
+    html+='<div class="card-verifiers">'+(isVer?'par '+esc(it.verifie):'')+'</div>';
     html+='</div>';
     card.innerHTML=html; grid.appendChild(card);
   }
@@ -718,9 +774,11 @@ document.getElementById('lb').addEventListener('click',function(e){
 /* ── Admin ── */
 function toggleAdmin() {
   if (adminMode) {
-    adminMode=false;
+    adminMode=false; ADMIN_NAME='';
     document.body.classList.remove('admin-on');
-    document.getElementById('lock-btn').classList.remove('unlocked');
+    var lb=document.getElementById('lock-btn');
+    lb.classList.remove('unlocked'); lb.title='Administration';
+    renderGallery();
   } else {
     document.getElementById('admin-pwd').value='';
     document.getElementById('admin-err').textContent='';
@@ -730,13 +788,17 @@ function toggleAdmin() {
 }
 function closeAdminModal(){ document.getElementById('admin-modal').style.display='none'; }
 function checkAdmin() {
-  if (document.getElementById('admin-pwd').value===ADMIN_PASSWORD) {
+  var input=document.getElementById('admin-pwd').value.trim().toLowerCase();
+  if(VALID_NAMES.indexOf(input)!==-1){
+    ADMIN_NAME=input.charAt(0).toUpperCase()+input.slice(1);
     adminMode=true;
     document.body.classList.add('admin-on');
-    document.getElementById('lock-btn').classList.add('unlocked');
+    var lb=document.getElementById('lock-btn');
+    lb.classList.add('unlocked'); lb.title=ADMIN_NAME+' connecté·e';
     closeAdminModal();
+    renderGallery();
   } else {
-    document.getElementById('admin-err').textContent='Mot de passe incorrect';
+    document.getElementById('admin-err').textContent='Prénom non reconnu';
     document.getElementById('admin-pwd').value='';
     document.getElementById('admin-pwd').focus();
   }
@@ -745,9 +807,9 @@ function checkAdmin() {
 
 <div id="admin-modal" class="admin-overlay" style="display:none">
   <div class="admin-box">
-    <div class="admin-title">Administration</div>
-    <input type="password" id="admin-pwd" class="admin-input" placeholder="Mot de passe"
-      onkeydown="if(event.key==='Enter')checkAdmin()">
+    <div class="admin-title">Qui es-tu ?</div>
+    <input type="text" id="admin-pwd" class="admin-input" placeholder="Ton prénom"
+      autocomplete="off" onkeydown="if(event.key==='Enter')checkAdmin()">
     <div id="admin-err" class="admin-err"></div>
     <div class="admin-btns">
       <button class="admin-cancel" onclick="closeAdminModal()">Annuler</button>

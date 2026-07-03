@@ -656,18 +656,21 @@ function verifyItem(row, btn) {
 }
 
 function updateLeaderboard() {
-  var scores={};
+  var scores={};  // clé lowercase → {display, count}
   for(var i=0;i<ITEMS.length;i++){
     var v=ITEMS[i].verifie||'';
     if(!v) continue;
     var ns=v.split(',');
     for(var j=0;j<ns.length;j++){
       var n=ns[j].trim();
-      if(n) scores[n]=(scores[n]||0)+1;
+      if(!n) continue;
+      var key=n.toLowerCase();
+      if(!scores[key]) scores[key]={display:n.charAt(0).toUpperCase()+n.slice(1).toLowerCase(),count:0};
+      scores[key].count++;
     }
   }
   var sorted=[];
-  for(var nm in scores) if(Object.prototype.hasOwnProperty.call(scores,nm)) sorted.push([nm,scores[nm]]);
+  for(var key2 in scores) if(Object.prototype.hasOwnProperty.call(scores,key2)) sorted.push([scores[key2].display,scores[key2].count]);
   sorted.sort(function(a,b){return b[1]-a[1];});
   var medals=['🥇','🥈','🥉'];
   var row=document.getElementById('leaderboard-row');

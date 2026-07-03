@@ -940,10 +940,15 @@ function saveTagEditor() {
       return;
     }
     for (var i=0; i<ITEMS.length; i++) {
-      if (ITEMS[i]._row===tagEditorRow) { ITEMS[i].serie=data.serie; break; }
+      if (ITEMS[i]._row===tagEditorRow) {
+        ITEMS[i].serie=data.serie;
+        if (data.verifie) ITEMS[i].verifie=data.verifie;
+        break;
+      }
     }
     closeTagEditor();
     renderGallery();
+    updateLeaderboard();
   };
   script.onerror = function(){btn.textContent='Erreur';btn.disabled=false;};
   script.src = API_BASE+'?action=updateTags&token='+encodeURIComponent(ADMIN_NAME)+'&row='+tagEditorRow+'&tags='+tagsParam+'&callback='+cbName;

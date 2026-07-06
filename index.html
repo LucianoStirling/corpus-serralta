@@ -156,6 +156,9 @@ body.full-mode .grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr));g
 .tag-check-row:hover{background:var(--bg)}
 .tag-check-row.checked{color:#2a7a3b;font-weight:500}
 .tag-check-row input{accent-color:#2a7a3b;flex-shrink:0;width:14px;height:14px;cursor:pointer}
+.tag-pinned{background:#fafaf8}
+.tag-separator{height:1px;background:var(--rule);margin:4px 0}
+.tag-required-err{font-size:11px;color:#c00;padding:4px 16px;display:none}
 #tag-drawer-footer{padding:12px 16px;border-top:1px solid var(--rule);
   display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
 #tag-save-btn{background:var(--ink);color:var(--white);border:none;
@@ -380,6 +383,8 @@ var hideVerified = false;
 var ADMIN_NAME   = '';  // prénom de la personne connectée
 var adminMode    = false;
 var VALID_NAMES  = ['anita','jorge','anahi','roberto','luciano','mogdad','maora','shaima','amelle','malik','louise','alix','liza','myriam','elisabeth'];
+var PINNED_TAGS  = ['Couleur', 'Noir et Blanc']; // toujours en tête, un obligatoire
+var SANS_TAG_KEY = '__aucun__';                  // chip filtre "sans série"
 
 /* ── Helpers ── */
 function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
@@ -612,7 +617,7 @@ function buildFilterChips() {
     (function(y,b){ b.onclick=function(){ toggleYear(y,b); }; })(years[i],yb);
     yc.appendChild(yb);
   }
-  var smap={}, skeys=[];
+  var smap={}, skeys=[], spinned=[];
   for (i=0; i<ITEMS.length; i++) {
     var pts=(ITEMS[i].serie||'').split('|');
     for (var j=0; j<pts.length; j++) {
@@ -620,8 +625,27 @@ function buildFilterChips() {
       if (sv2&&!smap[sv2]) { smap[sv2]=true; skeys.push(sv2); }
     }
   }
+  // Séparation pinned / reste
+  for (var pi=0; pi<PINNED_TAGS.length; pi++) {
+    var idx=skeys.indexOf(PINNED_TAGS[pi]);
+    if(idx!==-1){ spinned.push(skeys.splice(idx,1)[0]); }
+    else { spinned.push(PINNED_TAGS[pi]); } // toujours présent même si absent des données
+  }
   skeys.sort();
   var sc = document.getElementById('serie-chips');
+  // Chip "Sans série"
+  var sb0=document.createElement('button');
+  sb0.className='chip'; sb0.setAttribute('data-s',SANS_TAG_KEY); sb0.textContent='∅ Sans série';
+  sb0.onclick=function(){ toggleSerie(SANS_TAG_KEY,this); };
+  sc.appendChild(sb0);
+  // Pinned
+  for (i=0; i<spinned.length; i++) {
+    var sbp=document.createElement('button');
+    sbp.className='chip'; sbp.setAttribute('data-s',spinned[i]); sbp.textContent=spinned[i];
+    (function(s,b){ b.onclick=function(){ toggleSerie(s,b); }; })(spinned[i],sbp);
+    sc.appendChild(sbp);
+  }
+  // Reste
   for (i=0; i<skeys.length; i++) {
     var sb = document.createElement('button');
     sb.className='chip'; sb.setAttribute('data-s',skeys[i]); sb.textContent=skeys[i];
@@ -770,11 +794,16 @@ function filterItems() {
     var yearOk = noYear||sHas(activeYears,String(it.annee));
     tags=(it.serie||'').split('|');
     // Tags : AND — l'œuvre doit avoir TOUS les tags actifs
+    // Cas spécial : SANS_TAG_KEY → items sans aucun tag
     var serieOk=noSerie;
     if (!serieOk) {
-      serieOk=true;
-      var itemTags=sFromArr(tags.map(function(t){return t.trim();}));
-      for(var ak in activeSeries) if(sHas(activeSeries,ak)&&!sHas(itemTags,ak)){serieOk=false;break;}
+      if (sHas(activeSeries,SANS_TAG_KEY)) {
+        serieOk = !(it.serie && it.serie.trim());
+      } else {
+        serieOk=true;
+        var itemTags=sFromArr(tags.map(function(t){return t.trim();}));
+        for(var ak in activeSeries) if(sHas(activeSeries,ak)&&!sHas(itemTags,ak)){serieOk=false;break;}
+      }
     }
     var textOk=noSearch;
     if (!textOk) {
@@ -873,43 +902,50 @@ function openTagEditor(row) {
   document.getElementById('tag-save-btn').disabled = false;
   document.getElementById('tag-save-btn').textContent = 'Enregistrer';
 
-  // Construire la liste de toutes les séries uniques
+  // Construire la liste — pinned en tête, reste alphabétique
   var allSeries = [], seen = {};
   for (var j=0; j<ITEMS.length; j++) {
     var pts = (ITEMS[j].serie||'').split('|');
     for (var k=0; k<pts.length; k++) {
       var s = pts[k].trim();
-      if (s && !seen[s.toLowerCase()]) { seen[s.toLowerCase()]=true; allSeries.push(s); }
+      if (s && !seen[s.toLowerCase()] && PINNED_TAGS.indexOf(s)===-1) {
+        seen[s.toLowerCase()]=true; allSeries.push(s);
+      }
     }
   }
   allSeries.sort();
 
   var list = document.getElementById('tag-list'); list.innerHTML='';
-  for (var m=0; m<allSeries.length; m++) {
-    var nm = allSeries[m];
-    var isChk = tagEditorSelected.indexOf(nm) !== -1;
+  document.getElementById('tag-required-err').style.display='none';
+
+  function makeTagRow(tag, pinned) {
+    var isChk = tagEditorSelected.indexOf(tag) !== -1;
     var lbl = document.createElement('label');
-    lbl.className = 'tag-check-row' + (isChk?' checked':'');
+    lbl.className = 'tag-check-row'+(isChk?' checked':'')+(pinned?' tag-pinned':'');
     var cb = document.createElement('input');
-    cb.type = 'checkbox'; cb.checked = isChk;
-    cb.setAttribute('data-tag', nm);
-    (function(tag, label, checkbox) {
-      checkbox.onchange = function() {
-        if (this.checked) {
-          if (tagEditorSelected.length >= 5) { this.checked=false; return; }
-          tagEditorSelected.push(tag);
-          label.className='tag-check-row checked';
+    cb.type='checkbox'; cb.checked=isChk; cb.setAttribute('data-tag',tag);
+    (function(t,label,checkbox){
+      checkbox.onchange=function(){
+        if(this.checked){
+          if(tagEditorSelected.length>=5){this.checked=false;return;}
+          tagEditorSelected.push(t);
+          label.className='tag-check-row'+(pinned?' tag-pinned':'')+' checked';
         } else {
-          tagEditorSelected = tagEditorSelected.filter(function(t){return t!==tag;});
-          label.className='tag-check-row';
+          tagEditorSelected=tagEditorSelected.filter(function(x){return x!==t;});
+          label.className='tag-check-row'+(pinned?' tag-pinned':'');
         }
-        document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 5';
+        document.getElementById('tag-count').textContent=tagEditorSelected.length+' / 5';
+        document.getElementById('tag-required-err').style.display='none';
       };
-    })(nm, lbl, cb);
-    lbl.appendChild(cb);
-    lbl.appendChild(document.createTextNode(' '+nm));
-    list.appendChild(lbl);
+    })(tag,lbl,cb);
+    lbl.appendChild(cb); lbl.appendChild(document.createTextNode(' '+tag));
+    return lbl;
   }
+
+  for (var p=0; p<PINNED_TAGS.length; p++) list.appendChild(makeTagRow(PINNED_TAGS[p], true));
+  var sep=document.createElement('div'); sep.className='tag-separator'; list.appendChild(sep);
+  for (var m=0; m<allSeries.length; m++) list.appendChild(makeTagRow(allSeries[m], false));
+
   document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 5';
   document.getElementById('tag-panel').className = 'open';
 }
@@ -926,6 +962,12 @@ function closeTagEditor() {
 
 function saveTagEditor() {
   if (!tagEditorRow || !ADMIN_NAME) return;
+  // Validation : Couleur ou Noir et Blanc obligatoire
+  var hasPinned = tagEditorSelected.some(function(t){return PINNED_TAGS.indexOf(t)!==-1;});
+  if (!hasPinned) {
+    document.getElementById('tag-required-err').style.display='block';
+    return;
+  }
   var btn = document.getElementById('tag-save-btn');
   btn.textContent='…'; btn.disabled=true;
   var tagsParam = encodeURIComponent(tagEditorSelected.join('|'));
@@ -1062,6 +1104,7 @@ function checkAdmin() {
       <span id="tag-save-status" style="font-size:10px;color:#2a7a3b"></span>
     </div>
     <div id="tag-list"></div>
+    <div id="tag-required-err" class="tag-required-err">⚠ Couleur ou Noir et Blanc obligatoire</div>
     <div id="tag-new-err"></div>
     <div id="tag-new-row">
       <input id="tag-new-input" type="text" placeholder="Nouveau tag&#8230;"

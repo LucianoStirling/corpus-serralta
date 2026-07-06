@@ -99,10 +99,10 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .chip:hover{border-color:var(--mid)}
 .chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
 .chip-vsep{width:1px;background:rgba(0,0,0,.15);height:16px;flex-shrink:0;align-self:center;margin:0 4px}
-.admin-filter-chip{display:none}
-body.admin-on .admin-filter-chip{display:inline-flex}
-.admin-vsep{display:none}
-body.admin-on .admin-vsep{display:inline-block}
+.chip[data-admin]{display:none}
+body.admin-on .chip[data-admin]{display:inline-flex}
+.chip-vsep[data-admin]{display:none}
+body.admin-on .chip-vsep[data-admin]{display:inline-block}
 .filter-search-row{display:flex;align-items:center;gap:8px;padding:2px 0}
 .filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
   padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
@@ -650,10 +650,10 @@ function buildFilterChips() {
   }
   function makeVsep() { var d=document.createElement('span'); d.className='chip-vsep'; return d; }
   // Groupe 1 (admin seulement) : filtres techniques
-  var _b1=makeSerieChip(SANS_TAG_KEY,  '∅ Sans série');   _b1.classList.add('admin-filter-chip'); sc.appendChild(_b1);
-  var _b2=makeSerieChip(NON_TAGGE_KEY, '✕ Non tagué');    _b2.classList.add('admin-filter-chip'); sc.appendChild(_b2);
-  var _b3=makeSerieChip(NON_PINNED_KEY,'⊘ Sans C/NB/DP'); _b3.classList.add('admin-filter-chip'); sc.appendChild(_b3);
-  var _vs1=makeVsep(); _vs1.classList.add('admin-vsep'); sc.appendChild(_vs1);
+  var _b1=makeSerieChip(SANS_TAG_KEY,  '∅ Sans série');   _b1.setAttribute('data-admin','1'); sc.appendChild(_b1);
+  var _b2=makeSerieChip(NON_TAGGE_KEY, '✕ Non tagué');    _b2.setAttribute('data-admin','1'); sc.appendChild(_b2);
+  var _b3=makeSerieChip(NON_PINNED_KEY,'⊘ Sans C/NB/DP'); _b3.setAttribute('data-admin','1'); sc.appendChild(_b3);
+  var _vs1=makeVsep(); _vs1.setAttribute('data-admin','1'); sc.appendChild(_vs1);
   // Groupe 2 : Pinned (toujours présents)
   for (i=0; i<PINNED_TAGS.length; i++) sc.appendChild(makeSerieChip(PINNED_TAGS[i], PINNED_TAGS[i]));
   sc.appendChild(makeVsep());

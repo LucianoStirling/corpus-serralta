@@ -96,6 +96,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
   flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .chip:hover{border-color:var(--mid)}
 .chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.chip-vsep{width:1px;background:var(--rule);height:16px;flex-shrink:0;align-self:center;margin:0 2px}
 .filter-search-row{display:flex;align-items:center;gap:8px;padding:2px 0}
 .filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
   padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
@@ -383,8 +384,9 @@ var hideVerified = false;
 var ADMIN_NAME   = '';  // prénom de la personne connectée
 var adminMode    = false;
 var VALID_NAMES  = ['anita','jorge','anahi','roberto','luciano','mogdad','maora','shaima','amelle','malik','louise','alix','liza','myriam','elisabeth'];
-var PINNED_TAGS  = ['Couleur', 'Noir et Blanc']; // toujours en tête, un obligatoire
-var SANS_TAG_KEY = '__aucun__';                  // chip filtre "sans série"
+var PINNED_TAGS   = ['Couleur', 'Noir et Blanc', 'Diapo-Photo']; // toujours en tête, un obligatoire
+var SANS_TAG_KEY  = '__aucun__';   // items sans série réelle (hors pinned)
+var NON_TAGGE_KEY = '__nontagge__'; // items sans aucun tag
 
 /* ── Helpers ── */
 function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
@@ -617,41 +619,32 @@ function buildFilterChips() {
     (function(y,b){ b.onclick=function(){ toggleYear(y,b); }; })(years[i],yb);
     yc.appendChild(yb);
   }
-  var smap={}, skeys=[], spinned=[];
+  var smap={}, skeys=[];
   for (i=0; i<ITEMS.length; i++) {
     var pts=(ITEMS[i].serie||'').split('|');
     for (var j=0; j<pts.length; j++) {
       var sv2=pts[j].trim();
-      if (sv2&&!smap[sv2]) { smap[sv2]=true; skeys.push(sv2); }
+      if (sv2&&!smap[sv2]&&PINNED_TAGS.indexOf(sv2)===-1) { smap[sv2]=true; skeys.push(sv2); }
     }
-  }
-  // Séparation pinned / reste
-  for (var pi=0; pi<PINNED_TAGS.length; pi++) {
-    var idx=skeys.indexOf(PINNED_TAGS[pi]);
-    if(idx!==-1){ spinned.push(skeys.splice(idx,1)[0]); }
-    else { spinned.push(PINNED_TAGS[pi]); } // toujours présent même si absent des données
   }
   skeys.sort();
   var sc = document.getElementById('serie-chips');
-  // Chip "Sans série"
-  var sb0=document.createElement('button');
-  sb0.className='chip'; sb0.setAttribute('data-s',SANS_TAG_KEY); sb0.textContent='∅ Sans série';
-  sb0.onclick=function(){ toggleSerie(SANS_TAG_KEY,this); };
-  sc.appendChild(sb0);
-  // Pinned
-  for (i=0; i<spinned.length; i++) {
-    var sbp=document.createElement('button');
-    sbp.className='chip'; sbp.setAttribute('data-s',spinned[i]); sbp.textContent=spinned[i];
-    (function(s,b){ b.onclick=function(){ toggleSerie(s,b); }; })(spinned[i],sbp);
-    sc.appendChild(sbp);
+  function makeSerieChip(key, label) {
+    var b=document.createElement('button');
+    b.className='chip'; b.setAttribute('data-s',key); b.textContent=label;
+    (function(k,btn){ btn.onclick=function(){ toggleSerie(k,btn); }; })(key,b);
+    return b;
   }
-  // Reste
-  for (i=0; i<skeys.length; i++) {
-    var sb = document.createElement('button');
-    sb.className='chip'; sb.setAttribute('data-s',skeys[i]); sb.textContent=skeys[i];
-    (function(s,b){ b.onclick=function(){ toggleSerie(s,b); }; })(skeys[i],sb);
-    sc.appendChild(sb);
-  }
+  function makeVsep() { var d=document.createElement('span'); d.className='chip-vsep'; return d; }
+  // Groupe 1 : Sans série + Non tagué
+  sc.appendChild(makeSerieChip(SANS_TAG_KEY,  '∅ Sans série'));
+  sc.appendChild(makeSerieChip(NON_TAGGE_KEY, '✕ Non tagué'));
+  sc.appendChild(makeVsep());
+  // Groupe 2 : Pinned (toujours présents)
+  for (i=0; i<PINNED_TAGS.length; i++) sc.appendChild(makeSerieChip(PINNED_TAGS[i], PINNED_TAGS[i]));
+  sc.appendChild(makeVsep());
+  // Groupe 3 : reste alphabétique
+  for (i=0; i<skeys.length; i++) sc.appendChild(makeSerieChip(skeys[i], skeys[i]));
 }
 
 function toggleYear(y,btn) {
@@ -794,11 +787,16 @@ function filterItems() {
     var yearOk = noYear||sHas(activeYears,String(it.annee));
     tags=(it.serie||'').split('|');
     // Tags : AND — l'œuvre doit avoir TOUS les tags actifs
-    // Cas spécial : SANS_TAG_KEY → items sans aucun tag
     var serieOk=noSerie;
     if (!serieOk) {
-      if (sHas(activeSeries,SANS_TAG_KEY)) {
+      if (sHas(activeSeries,NON_TAGGE_KEY)) {
+        // Non tagué : aucun tag du tout
         serieOk = !(it.serie && it.serie.trim());
+      } else if (sHas(activeSeries,SANS_TAG_KEY)) {
+        // Sans série : aucun tag réel (les pinned ne comptent pas)
+        var realTags=(it.serie||'').split('|').map(function(t){return t.trim();})
+          .filter(function(t){return t&&PINNED_TAGS.indexOf(t)===-1;});
+        serieOk = realTags.length===0;
       } else {
         serieOk=true;
         var itemTags=sFromArr(tags.map(function(t){return t.trim();}));

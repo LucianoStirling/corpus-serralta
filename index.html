@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Corpus Serralta</title>
-<link rel="icon" type="image/png" href="favicon.png">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <style>
 /* ─────────────────────────────────────────────────────────────
    CORPUS SERRALTA — version GitHub Pages
@@ -259,6 +261,8 @@ body.hide-verified .card.verified{display:none}
 .ver-count{font-size:11px;color:#2a7a3b;white-space:nowrap}
 .admin-only{display:none}
 body.admin-on .admin-only{display:inline}
+#topbar-version{display:none;font-size:10px;color:var(--light);margin-left:8px;letter-spacing:.3px}
+body.admin-on #topbar-version{display:inline}
 /* ── LEADERBOARD ── */
 .leaderboard-row{display:none;align-items:center;gap:6px;padding:3px 0 2px;flex-wrap:wrap}
 body.admin-on .leaderboard-row{display:flex}
@@ -312,6 +316,7 @@ body.admin-on .leaderboard-row{display:flex}
   <div style="display:flex;align-items:baseline;gap:8px">
     <span class="topbar-title" onclick="goToTab('chrono')">Corpus Serralta</span>
     <span class="topbar-count" id="main-count"></span>
+    <span id="topbar-version"></span>
   </div>
   <div style="display:flex;gap:20px;align-items:center">
     <span class="topbar-nav" onclick="goToTab('chrono')">Chronologie</span>
@@ -374,7 +379,8 @@ body.admin-on .leaderboard-row{display:flex}
 var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
 var API_URL  = API_BASE + '?api=1';
 
-var ITEMS    = [];
+var ITEMS       = [];
+var APP_VERSION = '';
 var SHEET_ID = '';
 var GID      = '';
 var activeYears  = {};
@@ -414,8 +420,9 @@ function startApp() {
         return {ref:a[0],annee:a[1],technique:a[2],support:a[3],
                 serie:a[4],ico:a[5],crit:a[6],image_url:a[7],_row:a[8],verifie:a[9]||''};
       });
-      SHEET_ID = resp.sheetId;
-      GID      = resp.gid;
+      SHEET_ID    = resp.sheetId;
+      GID         = resp.gid;
+      APP_VERSION = resp.version || '';
       init();
     })
     .catch(function(err) {
@@ -434,6 +441,7 @@ function init() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('topbar').style.display  = 'flex';
   document.getElementById('main-count').textContent = ITEMS.length + ' œuvres';
+  var tv = document.getElementById('topbar-version'); if(tv) tv.textContent = APP_VERSION ? '· '+APP_VERSION : '';
   buildEntryPage();
   buildFilterChips();
   document.getElementById('entry-page').style.display = 'block';

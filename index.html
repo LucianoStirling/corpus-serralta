@@ -896,21 +896,21 @@ function openTagEditor(row) {
     (function(tag, label, checkbox) {
       checkbox.onchange = function() {
         if (this.checked) {
-          if (tagEditorSelected.length >= 4) { this.checked=false; return; }
+          if (tagEditorSelected.length >= 5) { this.checked=false; return; }
           tagEditorSelected.push(tag);
           label.className='tag-check-row checked';
         } else {
           tagEditorSelected = tagEditorSelected.filter(function(t){return t!==tag;});
           label.className='tag-check-row';
         }
-        document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 4';
+        document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 5';
       };
     })(nm, lbl, cb);
     lbl.appendChild(cb);
     lbl.appendChild(document.createTextNode(' '+nm));
     list.appendChild(lbl);
   }
-  document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 4';
+  document.getElementById('tag-count').textContent = tagEditorSelected.length+' / 5';
   document.getElementById('tag-panel').className = 'open';
 }
 
@@ -985,7 +985,7 @@ function addNewTag() {
         tagEditorSelected=tagEditorSelected.filter(function(x){return x!==t;});
         label.className='tag-check-row';
       }
-      document.getElementById('tag-count').textContent=tagEditorSelected.length+' / 4';
+      document.getElementById('tag-count').textContent=tagEditorSelected.length+' / 5';
     };
   })(tag,lbl,cb);
   lbl.appendChild(cb); lbl.appendChild(document.createTextNode(' '+tag));
@@ -998,7 +998,7 @@ function addNewTag() {
     }
   }
   if(!inserted) list.appendChild(lbl);
-  document.getElementById('tag-count').textContent=tagEditorSelected.length+' / 4';
+  document.getElementById('tag-count').textContent=tagEditorSelected.length+' / 5';
   inp.value='';
   // Écrire dans le Sheet Référentiel (JSONP, immédiat)
   var cbName='_at'+Date.now();
@@ -1058,7 +1058,7 @@ function checkAdmin() {
       <img id="tag-drawer-img-el" src="" alt="">
     </div>
     <div id="tag-drawer-info">
-      <span id="tag-count">0 / 4 tags</span>
+      <span id="tag-count">0 / 5 tags</span>
       <span id="tag-save-status" style="font-size:10px;color:#2a7a3b"></span>
     </div>
     <div id="tag-list"></div>

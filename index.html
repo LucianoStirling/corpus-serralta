@@ -407,7 +407,7 @@ var hideVerified = false;
 var ADMIN_NAME   = '';  // prénom de la personne connectée
 var adminMode    = false;
 var VALID_NAMES  = ['anita','jorge','anahi','roberto','luciano','mogdad','maora','shaima','amelle','malik','louise','alix','liza','myriam','elisabeth'];
-var PINNED_TAGS   = ['Couleur', 'Noir et Blanc', 'Diapo-Photo']; // toujours en tête, un obligatoire
+var PINNED_TAGS   = ['Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers']; // toujours en tête, un obligatoire
 var SANS_TAG_KEY  = '__aucun__';    // items sans série réelle (hors pinned)
 var NON_TAGGE_KEY = '__nontagge__'; // items sans aucun tag
 var NON_PINNED_KEY= '__nonpinned__';// items sans aucun tag pinné (Couleur/NB/DP)
@@ -469,22 +469,22 @@ function init() {
 var PERIODS = [
   { date: '1969 – 1976', title: 'L’établissement',
     years: ['1969','1974','1975','1976'],
-    desc: 'Les grandes séries ne s’inventent pas progressivement, elles sont toutes présentes dès 1976. CIENS-ART, Personnages Filiformes, Animaux, Habillés, Paquebot : tout est déjà là. La couleur explose aussi (aplats rose/rouge/vert/bleu)' },
+    desc: 'Les grandes séries ne s’inventent pas progressivement — elles sont toutes présentes en 1976. CIENS-ART, Personnages Filiformes, Animaux, Habillés, Paquebot : tout est là en 1976. La couleur explose aussi (aplats rose/rouge/vert/bleu) — le changement de registre qui annonce 1977, pas 1975.' },
   { date: '1977 – 1978', title: 'Le débordement',
     years: ['1977','1978'],
-    desc: 'La production se multiplie, mais ce qui est notable est l’équilibre de deux registres coexistant sans hiérarchie : peintures à l’aplat saturé, dessins au trait quasi-automatique d’un seul geste. 1978 commence à assagir sans unifier : c’est l’année où le corps et le système CIENS-ART se superposent pour la première fois en une même image.' },
+    desc: 'La production se multiplie, mais l’essentiel n’est pas là. Ce qui explose en 1977, c’est le nombre de registres simultanés : deux registres coexistent sans hiérarchie : peintures à l’aplat saturé, dessins au trait quasi-automatique d’un seul geste. 1978 commence à assagir sans unifier — c’est l’année où le corps et le système CIENS-ART se superposent pour la première fois en une même image.' },
   { date: '1979 – 1982', title: 'Le repli',
     years: ['1979','1980','1981','1982'],
-    desc: 'Contraction délibérée. Le Personnage Filiforme s’autonomise, la palette se refroidit. En 1982, minimum absolu : quelques dessins et un document dactylographié inclus dans le corpus au même titre qu’un dessin. Ce n’est pas un creux : c’est l’architecte théoricien qui reprend la main. Dans le même temps, les premiers visages-sujets apparaissent : ce n’est plus un visage dans une composition, un visage qui est la composition.' },
+    desc: 'Contraction délibérée. Le Personnage Filiforme s’autonomise, la palette se refroidit. En 1982, minimum absolu : quelques dessins et un document dactylographié inclus dans le corpus au même titre qu’un dessin. Ce n’est pas un creux : c’est l’architecte théoricien qui reprend la main. Dans le même temps, les premiers visages-sujets apparaissent : plus un visage dans une composition, un visage qui est la composition.' },
   { date: '1983', title: 'La Diapo-Photo',
     years: ['1983'],
-    desc: 'Année à part, sans équivalent ailleurs dans le corpus. Serralta dessine directement sur des photographies (parkings vus du ciel, rues, portraits, forêt de Fontainebleau..). Les lignes tracées sur la surface argentique ne commentent pas la photo : elles l’activent. La vue aérienne d’un parking avec des lignes d’énergie dessinées sur les voitures (1983_043) renvoie directement au travail d’urbaniste : l’urbaniste qui a pensé à l’échelle d’une ville.' },
+    desc: 'Année à part, sans équivalent ailleurs dans le corpus. Serralta dessine directement sur des photographies — parkings vus du ciel, rues, portraits, forêt de Fontainebleau. Les lignes tracées sur la surface argentique ne commentent pas la photo : elles l’activent. La vue aérienne d’un parking avec des lignes d’énergie dessinées sur les voitures (1983_043) renvoie directement au travail d’urbaniste — l’urbaniste qui a pensé à l’échelle d’une ville. Ce médium ne reviendra plus jamais.' },
   { date: '1984 – 1989', title: 'La maturité',
     years: ['1984','1985','1986','1987','1988','1989'],
-    desc: 'L’entrée dans cette période est marquée par les illustrations commandées pour le poète Higinio Mena. pourauoi le citer : c’est la seule logique illustrative externe, différente de tout ce qui précède et suit. À partir de 1985, le dessin à l’encre noire sur papier blanc s’impose définitivement : ligne assurée, format monumental, visage qui occupe tout le cadre. Deux développements majeurs : la convergence CIENS-ART / Visages (1987_030 — un visage humain inscrit dans les proportions de l’Unitor), et la transformation du Paquebot. Ce n’est plus une forme flottante : à partir de 1988–1989, ce sont des bâtiments-paquebots. Serralta reconstruit en dessin une Cité Radieuse sur laquelle il a travaillé quarante ans plus tôt.' },
+    desc: 'L’entrée dans cette période est marquée par les illustrations commandées pour le poète Higinio Mena (1984_008–015) — logique illustrative externe, différente de tout ce qui précède et suit. À partir de 1985, le dessin à l’encre noire sur papier blanc s’impose définitivement : ligne assurée, format monumental, visage qui occupe tout le cadre. Deux développements majeurs : la convergence CIENS-ART / Visages (1987_030 — un visage humain inscrit dans les proportions de l’Unitor), et la transformation du Paquebot. Ce n’est plus une forme flottante — à partir de 1988–1989, ce sont des bâtiments-paquebots. Serralta reconstruit en dessin une Cité Radieuse sur laquelle il a travaillé quarante ans plus tôt.' },
   { date: '1990 – 2001', title: 'La traversée',
     years: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001'],
-    desc: 'La qualité du dessin devient plus picturale : lavis, couleurs posées, moins de noir pur. La trinité Animaux / Visages / Paquebot se stabilise. Deux images-clés : 1994_012 (spirale CIENS-ART tracée directement sur un visage — synthèse absolue du corpus) et 1997_012 (la formule de l’Unitor annotée sur une photographie de la pyramide de Khéops — le système n’est pas une invention, c’est une redécouverte). En 2001, "CARNAC" inscrit dans une composition : les mégalithes bretons de son lieu de retraite rejoignent Khéops dans le même réseau de lois universelles.' },
+    desc: 'La qualité du dessin devient plus picturale : lavis, couleurs posées, moins de noir pur. La trinité Animaux / Visages / Paquebot se stabilise. Deux images-clés : 1994_012 (spirale CIENS-ART tracée directement sur un visage — synthèse absolue du corpus) et 1997_012 (la formule de l’Unitor annotée sur une photographie de la pyramide de Khéops — le système n’est pas une invention, c’est une redécouverte). En 2001, "CARNAC" inscrit dans une composition — les mégalithes bretons de son lieu de retraite rejoignent Khéops dans le même réseau de lois universelles.' },
   { date: '2002 – 2011', title: 'L’horizon cosmologique',
     years: ['2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
     desc: 'Production rare, œuvres denses. CIENS-ART revient en premier plan, de plus en plus cosmologique. La dernière œuvre du corpus — 2011_001, réalisée l’année de sa mort — est un diagramme CIENS-ART annoté "COSMOS" : cercles concentriques, triangles, nombres, couleurs primaires. Le corpus commence en 1975 avec les premières grilles CIENS-ART. Il se referme sur une cosmologie CIENS-ART. La boucle est fermée.' }
@@ -521,7 +521,7 @@ var BIO_DOC_FILE_ID = '13D9-mJlnZ9j7cfLM90yPJIzozfQSkxUH';
 
 /* ── Count helpers ── */
 function topSeriesForYears(years, n) {
-  var counts = {}, PINNED = ['Couleur','Noir et Blanc','Diapo-Photo'];
+  var counts = {}, PINNED = PINNED_TAGS;
   for (var i=0; i<ITEMS.length; i++) {
     if (years.indexOf(String(ITEMS[i].annee)) === -1) continue;
     var tags = (ITEMS[i].serie||'').split('|');
@@ -1200,7 +1200,7 @@ function checkAdmin() {
       <span id="tag-save-status" style="font-size:10px;color:#2a7a3b"></span>
     </div>
     <div id="tag-list"></div>
-    <div id="tag-required-err" class="tag-required-err">⚠ Couleur ou Noir et Blanc obligatoire</div>
+    <div id="tag-required-err" class="tag-required-err">⚠ Au moins un tag technique obligatoire (Couleur, Noir et Blanc, Diapo-Photo, Martelés, Sculptures, Supports Divers)</div>
     <div id="tag-new-err"></div>
     <div id="tag-new-row">
       <input id="tag-new-input" type="text" placeholder="Nouveau tag&#8230;"

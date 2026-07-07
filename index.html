@@ -9,7 +9,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <style>
 /* ─────────────────────────────────────────────────────────────
-   CORPUS SERRALTA — version GitHub Pages
+   CORPUS SERRALTA, version GitHub Pages
    Données via fetch() depuis Apps Script JSON API (?api=1)
    Pas de Caja, @media natifs, responsive standard
 ───────────────────────────────────────────────────────────── */
@@ -405,7 +405,7 @@ body.admin-on .leaderboard-row{display:flex}
 
 <script>
 /* ================================================================
-   CORPUS SERRALTA — GitHub Pages standalone
+   CORPUS SERRALTA, GitHub Pages standalone
    Modifier API_URL après chaque nouveau déploiement Apps Script
    ================================================================ */
 var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
@@ -463,7 +463,7 @@ function startApp() {
         msg.className = 'err-msg';
         msg.textContent = 'Impossible de charger le catalogue.';
       }
-      if (sub) sub.textContent = err.message + ' — Vérifier la connexion et réessayer.';
+      if (sub) sub.textContent = err.message + ', Vérifier la connexion et réessayer.';
     });
 }
 
@@ -484,49 +484,50 @@ function init() {
 var PERIODS = [
   { date: '1969 – 1976', title: 'L’établissement',
     years: ['1969','1974','1975','1976'],
-    desc: 'Les grandes séries ne s’inventent pas progressivement — elles sont toutes présentes en 1976. CIENS-ART, Personnages Filiformes, Animaux, Habillés, Paquebot : tout est là en 1976. La couleur explose aussi (aplats rose/rouge/vert/bleu) — le changement de registre qui annonce 1977, pas 1975.' },
+    desc: 'Les grandes séries ne s’inventent pas progressivement, elles sont toutes présentes en 1976. SCIENS-ART, Personnages Filiformes, Animaux, Habillés, Paquebot : tout est là en 1976. La couleur explose aussi (aplats rose/rouge/vert/bleu), le changement de registre qui annonce 1977, pas 1975.' },
   { date: '1977 – 1978', title: 'Le débordement',
     years: ['1977','1978'],
-    desc: 'La production se multiplie, mais l’essentiel n’est pas là. Ce qui explose en 1977, c’est le nombre de registres simultanés : deux registres coexistent sans hiérarchie : peintures à l’aplat saturé, dessins au trait quasi-automatique d’un seul geste. 1978 commence à assagir sans unifier — c’est l’année où le corps et le système CIENS-ART se superposent pour la première fois en une même image.' },
+    desc: 'La production se multiplie, mais l’essentiel n’est pas là. Ce qui explose en 1977, c’est le nombre de registres simultanés : deux registres coexistent sans hiérarchie : peintures à l’aplat saturé, dessins au trait quasi-automatique d’un seul geste. 1978 commence à assagir sans unifier, c’est l’année où le corps et le système SCIENS-ART se superposent pour la première fois en une même image.' },
   { date: '1979 – 1982', title: 'Le repli',
     years: ['1979','1980','1981','1982'],
     desc: 'Contraction délibérée. Le Personnage Filiforme s’autonomise, la palette se refroidit. En 1982, minimum absolu : quelques dessins et un document dactylographié inclus dans le corpus au même titre qu’un dessin. Ce n’est pas un creux : c’est l’architecte théoricien qui reprend la main. Dans le même temps, les premiers visages-sujets apparaissent : plus un visage dans une composition, un visage qui est la composition.' },
   { date: '1983', title: 'La Diapo-Photo',
     years: ['1983'],
-    desc: 'Année à part, sans équivalent ailleurs dans le corpus. Serralta dessine directement sur des photographies — parkings vus du ciel, rues, portraits, forêt de Fontainebleau. Les lignes tracées sur la surface argentique ne commentent pas la photo : elles l’activent. La vue aérienne d’un parking avec des lignes d’énergie dessinées sur les voitures (1983_043) renvoie directement au travail d’urbaniste — l’urbaniste qui a pensé à l’échelle d’une ville. Ce médium ne reviendra plus jamais.' },
+    desc: 'Année à part, sans équivalent ailleurs dans le corpus. Serralta dessine directement sur des photographies, parkings vus du ciel, rues, portraits, forêt de Fontainebleau. Les lignes tracées sur la surface argentique ne commentent pas la photo : elles l’activent. La vue aérienne d’un parking avec des lignes d’énergie dessinées sur les voitures (1983_043) renvoie directement au travail d’urbaniste, l’urbaniste qui a pensé à l’échelle d’une ville. Ce médium ne reviendra plus jamais.' },
   { date: '1984 – 1989', title: 'La maturité',
     years: ['1984','1985','1986','1987','1988','1989'],
-    desc: 'L’entrée dans cette période est marquée par les illustrations commandées pour le poète Higinio Mena (1984_008–015) — logique illustrative externe, différente de tout ce qui précède et suit. À partir de 1985, le dessin à l’encre noire sur papier blanc s’impose définitivement : ligne assurée, format monumental, visage qui occupe tout le cadre. Deux développements majeurs : la convergence CIENS-ART / Visages (1987_030 — un visage humain inscrit dans les proportions de l’Unitor), et la transformation du Paquebot. Ce n’est plus une forme flottante — à partir de 1988–1989, ce sont des bâtiments-paquebots. Serralta reconstruit en dessin une Cité Radieuse sur laquelle il a travaillé quarante ans plus tôt.' },
+    desc: 'L’entrée dans cette période est marquée par les illustrations commandées pour le poète Higinio Mena (1984_008–015), logique illustrative externe, différente de tout ce qui précède et suit. À partir de 1985, le dessin à l’encre noire sur papier blanc s’impose définitivement : ligne assurée, format monumental, visage qui occupe tout le cadre. Deux développements majeurs : la convergence SCIENS-ART / Visages (1987_030, un visage humain inscrit dans les proportions de l’Unitor), et la transformation du Paquebot. Ce n’est plus une forme flottante, à partir de 1988–1989, ce sont des bâtiments-paquebots. Serralta reconstruit en dessin une Cité Radieuse sur laquelle il a travaillé quarante ans plus tôt.' },
   { date: '1990 – 2001', title: 'La traversée',
     years: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001'],
-    desc: 'La qualité du dessin devient plus picturale : lavis, couleurs posées, moins de noir pur. La trinité Animaux / Visages / Paquebot se stabilise. Deux images-clés : 1994_012 (spirale CIENS-ART tracée directement sur un visage — synthèse absolue du corpus) et 1997_012 (la formule de l’Unitor annotée sur une photographie de la pyramide de Khéops — le système n’est pas une invention, c’est une redécouverte). En 2001, "CARNAC" inscrit dans une composition — les mégalithes bretons de son lieu de retraite rejoignent Khéops dans le même réseau de lois universelles.' },
+    desc: 'La qualité du dessin devient plus picturale : lavis, couleurs posées, moins de noir pur. La trinité Animaux / Visages / Paquebot se stabilise. Deux images-clés : 1994_012 (spirale SCIENS-ART tracée directement sur un visage, synthèse absolue du corpus) et 1997_012 (la formule de l’Unitor annotée sur une photographie de la pyramide de Khéops, le système n’est pas une invention, c’est une redécouverte). En 2001, "CARNAC" inscrit dans une composition, les mégalithes bretons de son lieu de retraite rejoignent Khéops dans le même réseau de lois universelles.' },
   { date: '2002 – 2011', title: 'L’horizon cosmologique',
     years: ['2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
-    desc: 'Production rare, œuvres denses. CIENS-ART revient en premier plan, de plus en plus cosmologique. La dernière œuvre du corpus — 2011_001, réalisée l’année de sa mort — est un diagramme CIENS-ART annoté "COSMOS" : cercles concentriques, triangles, nombres, couleurs primaires. Le corpus commence en 1975 avec les premières grilles CIENS-ART. Il se referme sur une cosmologie CIENS-ART. La boucle est fermée.' }
+    desc: 'Production rare, œuvres denses. SCIENS-ART revient en premier plan, de plus en plus cosmologique. La dernière œuvre du corpus, 2011_001, réalisée l’année de sa mort, est un diagramme SCIENS-ART annoté "COSMOS" : cercles concentriques, triangles, nombres, couleurs primaires. Le corpus commence en 1975 avec les premières grilles SCIENS-ART. Il se referme sur une cosmologie SCIENS-ART. La boucle est fermée.' }
 ]
 
 
 
 var SERIES_MAJOR = [
   { name: 'Animaux', desc: 'Chevaux, taureaux, oiseaux rapaces, félins. Souvent en tension ou fusion avec le nu humain. Héritiers de la tradition mythologique, réinterprétés sans narration illustrative.' },
-  { name: 'Visages', desc: 'Les visages de grand format où les détails du regard et du visage sont travaillés avec précision — en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.' },
-  { name: 'CIENS-ART', desc: 'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes d’énergie — une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.' },
+  { name: 'Visages', desc: 'Les visages de grand format où les détails du regard et du visage sont travaillés avec précision, en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.' },
+  { name: 'SCIENS-ART', desc: 'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes d’énergie, une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.' },
   { name: 'Musique', desc: 'Pianistes, violoncellistes, bandónistes, violonistes. Les musiciens fusionnent avec leurs instruments jusqu’à la dissolution formelle. Lien profond avec la culture rioplatense.' },
-  { name: 'Paquebot', desc: 'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement — motif autobiographique discret.' },
+  { name: 'Paquebot', desc: 'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement, motif autobiographique discret.' },
   { name: 'Portraits', desc: 'Visages très travaillés, regards frontaux d’une intensité inhabituelle. Certains portraits-cosmos portent un univers miniaturisé au-dessus de la tête.' },
-  { name: 'Manuscrit', desc: 'Œuvres intégrant texte manuscrit — poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
-  { name: 'Supports', desc: 'Tous les supports alternatifs au papier standard — pochettes de disques, boîtes, objets retravillés, matériaux martelés. Le support comme matière expressive à part entière.' },
-  { name: 'Diapo-Photo', desc: 'Diapogravures — technique unique de Serralta, travail direct sur diapositives 35 mm — et quelques montages photographiques. Procédé artisanal sans équivalent dans l’œuvre connue.' },
+  { name: 'Manuscrit', desc: 'Œuvres intégrant texte manuscrit : poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
+  { name: 'Supports Divers', desc: 'Tout ce qui n’est pas le papier Canson habituel : carton, polystyrène, enveloppes, matériaux récupérés. Le support n’est jamais anodin, il altère le tracé, contraint le geste, transforme la surface en co-auteur de l’image.' },
+  { name: 'Martelés', desc: 'Technique propre à Serralta : la reproduction photographique d’un dessin est collée sur mousse expansive, puis martelée à la main pour créer un relief en creux. De l’encre est souvent ajoutée dans les zones martelées, révélant l’empreinte du geste. À mi-chemin entre dessin, estampe et sculpture.' },
+  { name: 'Diapo-Photo', desc: 'Diapogravures, technique unique de Serralta, travail direct sur diapositives 35 mm, et quelques montages photographiques. Procédé artisanal sans équivalent dans l’œuvre connue.' },
   { name: 'Diapogravure', desc: 'Technique unique : travail direct sur diapositives 35 mm. Procédé artisanal personnel sans équivalent recensé dans l’œuvre connue de Serralta.' },
   { name: 'Personnages Filiformes', desc: 'Serralta efface la masse des corps et réduit la figure à un tracé minimal, linéaire. Ce dépouillement détonne par rapport au caractère plantureux et charnel de la majorité de son œuvre.' },
-  { name: 'Politique', desc: 'Les militaires, les drapeaux, les scènes de torture. Trace de l’exil et de la dictature uruguayenne — une présence rare mais explicite dans un corpus plutôt cosmologique.' },
-  { name: 'Habillés', desc: 'Contrepoint aux nus omniprésents : chez Serralta, la nudité est l’état naturel. Un personnage habillé devient porteur d’une symbolique — militaires, prêtres, figures d’autorité.' },
+  { name: 'Politique', desc: 'Les militaires, les drapeaux, les scènes de torture. Trace de l’exil et de la dictature uruguayenne, une présence rare mais explicite dans un corpus plutôt cosmologique.' },
+  { name: 'Habillés', desc: 'Contrepoint aux nus omniprésents : chez Serralta, la nudité est l’état naturel. Un personnage habillé devient porteur d’une symbolique, militaires, prêtres, figures d’autorité.' },
   { name: 'Urbanisme', desc: 'Paysages reconnaissables, croquis architecturaux, vues urbaines. Les rares moments où Serralta ancre la composition dans un espace géographique identifiable.' },
   { name: 'Mise en abyme', desc: 'La main, le doigt ou le stylo de l’artiste apparaît dans le dessin en train de dessiner. Geste réflexif classique, rare chez Serralta mais toujours délibéré.' },
-  { name: 'Sport', desc: 'Football, champs de courses, compétitions. Hommage à la culture populaire rioplatense — thème festif, loin du symbolisme chargé du reste de l’œuvre.' },
+  { name: 'Sport', desc: 'Football, champs de courses, compétitions. Hommage à la culture populaire rioplatense, thème festif, loin du symbolisme chargé du reste de l’œuvre.' },
   { name: 'Nus', desc: 'Motif le plus constant, présent dès 1976 et jamais abandonné. Corps multiple, frontal, intégré à la nature ou confronté à l’animal. Le nu est pour Serralta une syntaxe autant qu’un sujet.' },
   { name: 'Études', desc: 'Recherches formelles préparatoires ou autonomes : esquisses de figures, études de mains et de visages. Le laboratoire visible de la pratique de Serralta.' },
-  { name: 'Dédicaces', desc: 'Œuvres offertes et dédicacées, souvent de format modeste. Révèlent le réseau amical et intellectuel de Serralta — musiciens, architectes, poètes.' },
+  { name: 'Dédicaces', desc: 'Œuvres offertes et dédicacées, souvent de format modeste. Révèlent le réseau amical et intellectuel de Serralta : musiciens, architectes, poètes.' },
   { name: 'Illustrations Higinio Mena', desc: 'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena, ami de longue date. Seule collaboration éditoriale documentée de Serralta.' },
   { name: 'Série peintures', desc: 'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.' },
   { name: 'Sculptures', desc: 'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.' }
@@ -591,7 +592,7 @@ function buildEntryPage() {
     img.onclick = function(){ openLB(bioUrl); }; img.style.cursor='zoom-in';
     bw.appendChild(img);
     var cap = document.createElement('p'); cap.className='bio-caption';
-    cap.textContent = 'Chronologie autobiographique dessinée de la main de Serralta — âge vs année, de Melo 1919 aux années 2000.';
+    cap.textContent = 'Chronologie autobiographique dessinée de la main de Serralta, âge vs année, de Melo 1919 aux années 2000.';
     cv.appendChild(cap);
   }
   var CHRONO_YRS = [
@@ -624,9 +625,9 @@ function buildEntryPage() {
 
   var intro = document.createElement('div');
   intro.className = 'ctx-intro';
-  intro.innerHTML = "<p>Architecte, urbaniste et chercheur franco-uruguayen, Justino Serralta (Melo, 1919 — Jullouville, 2011) est contraint à l’exil en France en 1974, lors de la dictature uruguayenne. C’est dans cet exil — à Paris, puis comme enseignant à Saint-Étienne et à Rennes — qu’il produit l’essentiel de ce corpus dessiné, plus de 1 200 œuvres réalisées entre 1976 et 2011.</p>"
-    + "<p>La figure humaine en est le motif central et quasi-absolu. Elle y apparaît le plus souvent nue — non par provocation, mais parce que la nudité efface les marqueurs de classe, de statut et de métier. C’est l’inverse qui signale quelque chose : quand un personnage est habillé, il devient porteur d’une symbolique précise — militaire, prêtre, figure d’autorité. Cette logique explique que le corpus n’ait pas de série « Nus » : c’est « Habillés » qui est la série, parce que le vêtement, lui, fait sens. Il existe bien des œuvres traitant de la volupté et du désir, mais elles sont étonnamment rares au regard de l’ensemble.</p>"
-    + "<p>CIENS-ART est l’expression plastique de l’Unitor, le système de pensée que Serralta développe à partir des années 1970 pour relier architecture, science, art et société — un outil conceptuel dont le livre fondateur entre dans la collection permanente du MoMa. Cercles d’énergie, grilles de forces, cartographies cosmologiques : CIENS-ART est le langage universel mis en images.</p>";
+  intro.innerHTML = "<p>Architecte, urbaniste et chercheur franco-uruguayen, Justino Serralta (Melo, 1919 , Jullouville, 2011) est contraint à l’exil en France en 1974, lors de la dictature uruguayenne. C’est dans cet exil , à Paris, puis comme enseignant à Saint-Étienne et à Rennes , qu’il produit l’essentiel de ce corpus dessiné, plus de 1 200 œuvres réalisées entre 1976 et 2011.</p>"
+    + "<p>La figure humaine en est le motif central et quasi-absolu. Elle y apparaît le plus souvent nue, non par provocation, mais parce que la nudité efface les marqueurs de classe, de statut et de métier. C’est l’inverse qui signale quelque chose : quand un personnage est habillé, il devient porteur d’une symbolique précise, militaire, prêtre, figure d’autorité. Cette logique explique que le corpus n’ait pas de série « Nus » : c’est « Habillés » qui est la série, parce que le vêtement, lui, fait sens. Il existe bien des œuvres traitant de la volupté et du désir, mais elles sont étonnamment rares au regard de l’ensemble.</p>"
+    + "<p>SCIENS-ART est l’expression plastique de l’Unitor, le système de pensée que Serralta développe à partir des années 1970 pour relier architecture, science, art et société , un outil conceptuel dont le livre fondateur entre dans la collection permanente du MoMa. Cercles d’énergie, grilles de forces, cartographies cosmologiques : SCIENS-ART est le langage universel mis en images.</p>";
   cv.insertBefore(intro, cv.querySelector('.chrono-bio-row'));
 
 
@@ -762,9 +763,9 @@ function buildFilterChips() {
   for (i=0; i<PINNED_TAGS.length; i++) sc1.appendChild(makeSerieChip(PINNED_TAGS[i], PINNED_TAGS[i]));
   // ── Ligne 2 : Séries thématiques ──
   var sc2=document.getElementById('serie-chips-theme');
-  sc2.appendChild(makeSerieChip(SANS_TAG_KEY, 'Hors séries — '+horsN));
+  sc2.appendChild(makeSerieChip(SANS_TAG_KEY, 'Hors séries · '+horsN));
   sc2.appendChild(makeVsep());
-  for (i=0; i<skeys.length; i++) sc2.appendChild(makeSerieChip(skeys[i], skeys[i]+' — '+scount2[skeys[i]]));
+  for (i=0; i<skeys.length; i++) sc2.appendChild(makeSerieChip(skeys[i], skeys[i]+' · '+scount2[skeys[i]]));
 }
 
 function toggleYear(y,btn) {

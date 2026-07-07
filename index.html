@@ -49,8 +49,23 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .ctx-subtitle{font-size:13px;color:var(--light);margin-bottom:20px;letter-spacing:.3px}
 
 /* ── CHRONO LAYOUT ── */
-.chrono-layout{display:grid;grid-template-columns:440px 1fr;gap:40px;align-items:start}
-.chrono-bio{position:sticky;top:110px}
+.chrono-bio-row{display:flex;justify-content:center;align-items:flex-start;gap:12px}
+.chrono-bio-wrap{position:relative;display:inline-block;flex-shrink:0}
+.chrono-bio-wrap img{max-height:78vh;width:auto;display:block;border:1px solid var(--rule)}
+.chrono-yr-col{position:relative;width:240px;align-self:stretch;flex-shrink:0;margin-left:4px}
+/* quinconce : colonne A (gauche) et colonne B (droite) */
+.chrono-yr-btn{position:absolute;width:116px;padding:3px 8px;
+  border:1px solid #c8c4bc;background:#f0eeea;color:var(--ink);
+  cursor:pointer;transform:translateY(-50%);transition:all .12s;
+  border-radius:2px;box-sizing:border-box;display:flex;align-items:center;gap:4px}
+.chrono-yr-btn.col-a{left:0}
+.chrono-yr-btn.col-b{right:0}
+.chrono-yr-btn:hover{background:#b83228;color:#fff;border-color:#b83228}
+.yr-n{font-size:10px;font-weight:700;font-variant-numeric:tabular-nums;flex-shrink:0}
+.yr-e{font-size:9px;color:#888;font-style:italic;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chrono-yr-btn:hover .yr-e{color:#fdd;font-style:normal}
+.bio-caption{font-size:10px;color:var(--light);font-style:italic;line-height:1.5;
+  max-width:520px;margin:10px auto 0;text-align:center}
 .bio-img-wrap{cursor:zoom-in;margin-bottom:12px;border:1px solid var(--rule)}
 .bio-img-wrap img{width:100%;display:block}
 .bio-placeholder{width:100%;aspect-ratio:3/4;background:var(--rule);
@@ -418,7 +433,7 @@ function sAdd(o,k){o[String(k)]=true}
 function sDel(o,k){delete o[String(k)]}
 function sSize(o){return Object.keys(o).length}
 function sClear(o){var ks=Object.keys(o);for(var i=0;i<ks.length;i++)delete o[ks[i]]}
-function sFromArr(a){var o={};for(var i=0;i<a.length;i++)o[String(a[i])]=true;return o}
+function sFromArr(a){var o={};if(a)for(var i=0;i<a.length;i++)o[String(a[i])]=true;return o}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
 /* ── Startup — fetch JSON API ── */
@@ -518,6 +533,7 @@ var SERIES_MAJOR = [
 ];
 
 var BIO_DOC_FILE_ID = '13D9-mJlnZ9j7cfLM90yPJIzozfQSkxUH';
+// var BIO_IMG_FILE = 'bio_chronologie.png';  // décommenter pour PNG local propre (sans labels)
 
 /* ── Count helpers ── */
 function topSeriesForYears(years, n) {
@@ -560,49 +576,59 @@ function buildEntryPage() {
 
   /* CHRONOLOGIE */
   var cv = document.getElementById('chrono-view');
-  cv.innerHTML = '<p class="ctx-label">Les grandes périodes stylistiques</p>' +
-    '<div class="chrono-layout">' +
-    '<div class="chrono-bio" id="chrono-bio-col"></div>' +
-    '<div class="period-list" id="period-list"></div>' +
+  cv.innerHTML = '<p class="ctx-label">Chronologie autobiographique</p>' +
+    '<div class="chrono-bio-row">' +
+    '<div class="chrono-bio-wrap" id="chrono-bio-wrap"></div>' +
+    '<div class="chrono-yr-col" id="chrono-yr-col"></div>' +
     '</div>';
-
-  var bioCol = document.getElementById('chrono-bio-col');
-  if (BIO_DOC_FILE_ID) {
-    var bioUrl = 'https://lh3.googleusercontent.com/d/' + BIO_DOC_FILE_ID;
-    bioCol.innerHTML = '<div class="bio-img-wrap" onclick="openLB(\'' + bioUrl + '\')">' +
-      '<img src="' + bioUrl + '" alt="Chronologie autobiographique J. Serralta"></div>' +
-      '<p class="bio-caption">Chronologie autobiographique dessinée de la main de Serralta — âge vs année, de Melo 1919 aux années 2000. On y lit l’exil (1973), la création de CIENS-ART (1976), les années à l’École d’Architecture de Rennes. Archive familiale.</p>';
+  var bioUrl = (typeof BIO_IMG_FILE !== 'undefined' && BIO_IMG_FILE)
+    ? BIO_IMG_FILE
+    : (BIO_DOC_FILE_ID ? 'https://lh3.googleusercontent.com/d/' + BIO_DOC_FILE_ID : null);
+  if (bioUrl) {
+    var bw = document.getElementById('chrono-bio-wrap');
+    var img = document.createElement('img');
+    img.src = bioUrl; img.alt = 'Chronologie autobiographique J. Serralta';
+    img.onclick = function(){ openLB(bioUrl); }; img.style.cursor='zoom-in';
+    bw.appendChild(img);
+    var cap = document.createElement('p'); cap.className='bio-caption';
+    cap.textContent = 'Chronologie autobiographique dessinée de la main de Serralta — âge vs année, de Melo 1919 aux années 2000.';
+    cv.appendChild(cap);
   }
-
+  var CHRONO_YRS = [
+    ["2009–11", ["2009", "2010", "2011"], 4.9, null, "a"],
+    ["2006–08", ["2006", "2007", "2008"], 7.6, null, "b"],
+    ["2003–05", ["2003", "2004", "2005"], 10.4, null, "a"],
+    ["2000–02", ["2000", "2001", "2002"], 13.1, null, "b"],
+    ["1997–99", ["1997", "1998", "1999"], 15.8, "Retraite", "a"],
+    ["1994–96", ["1994", "1995", "1996"], 18.5, null, "b"],
+    ["1991–93", ["1991", "1992", "1993"], 21.3, "Lib. Charles", "a"],
+    ["1988–90", ["1988", "1989", "1990"], 24.0, "Normandie", "b"],
+    ["1985–87", ["1985", "1986", "1987"], 26.7, null, "a"],
+    ["1982–84", ["1982", "1983", "1984"], 29.5, "Arch. Rennes", "b"],
+    ["1979–81", ["1979", "1980", "1981"], 32.2, "Unitor", "a"],
+    ["1976–78", ["1976", "1977", "1978"], 34.9, "EA St-Étienne", "b"],
+    ["1974–75", ["1974", "1975"], 37.2, "Exil", "a"],
+    ["1972–73", ["1972", "1973"], 39.0, "Dictature", "b"],
+    ["1969–71", ["1969", "1970", "1971"], 41.3, null, "a"],
+    ["1967–68", ["1967", "1968"], 43.5, null, "b"],
+  ];
+  var yrc = document.getElementById('chrono-yr-col');
+  CHRONO_YRS.forEach(function(d) {
+    var lbl=d[0], yrs=d[1], p=d[2], ev=d[3], col=d[4];
+    var b=document.createElement('div');
+    b.className='chrono-yr-btn col-'+col; b.style.top=p+'%';
+    b.innerHTML='<span class="yr-n">'+lbl+'</span>'+(ev?'<span class="yr-e">'+ev+'</span>':'');
+    b.onclick=function(){openGallery(yrs,[]);};
+    yrc.appendChild(b);
+  });
 
   var intro = document.createElement('div');
   intro.className = 'ctx-intro';
   intro.innerHTML = "<p>Architecte, urbaniste et chercheur franco-uruguayen, Justino Serralta (Melo, 1919 — Jullouville, 2011) est contraint à l’exil en France en 1974, lors de la dictature uruguayenne. C’est dans cet exil — à Paris, puis comme enseignant à Saint-Étienne et à Rennes — qu’il produit l’essentiel de ce corpus dessiné, plus de 1 200 œuvres réalisées entre 1976 et 2011.</p>"
     + "<p>La figure humaine en est le motif central et quasi-absolu. Elle y apparaît le plus souvent nue — non par provocation, mais parce que la nudité efface les marqueurs de classe, de statut et de métier. C’est l’inverse qui signale quelque chose : quand un personnage est habillé, il devient porteur d’une symbolique précise — militaire, prêtre, figure d’autorité. Cette logique explique que le corpus n’ait pas de série « Nus » : c’est « Habillés » qui est la série, parce que le vêtement, lui, fait sens. Il existe bien des œuvres traitant de la volupté et du désir, mais elles sont étonnamment rares au regard de l’ensemble.</p>"
     + "<p>CIENS-ART est l’expression plastique de l’Unitor, le système de pensée que Serralta développe à partir des années 1970 pour relier architecture, science, art et société — un outil conceptuel dont le livre fondateur entre dans la collection permanente du MoMa. Cercles d’énergie, grilles de forces, cartographies cosmologiques : CIENS-ART est le langage universel mis en images.</p>";
-  cv.insertBefore(intro, cv.querySelector('.chrono-layout'));
+  cv.insertBefore(intro, cv.querySelector('.chrono-bio-row'));
 
-  var pl = document.getElementById('period-list');
-  for (pi=0; pi<PERIODS.length; pi++) {
-    var p = PERIODS[pi];
-    var cnt = countForYears(p.years);
-    if (!cnt) continue;
-    var row = document.createElement('div');
-    row.className = 'period-row';
-    var topS = topSeriesForYears(p.years, 3);
-    var chipsHtml = topS.map(function(s){
-      var yrs  = JSON.stringify(p.years).replace(/"/g,"'");
-      var snm2 = JSON.stringify([s[0]]).replace(/"/g,"'");
-      return '<span class="period-serie-chip" onclick="event.stopPropagation();openGallery('+yrs+','+snm2+')">'+esc(s[0])+' <span class="psc-cnt">'+s[1]+'</span></span>';
-    }).join('');
-    row.innerHTML = '<div class="period-date">' + p.date + '</div>' +
-      '<div><div class="period-title">' + p.title + '</div>' +
-      '<div class="period-desc">' + p.desc + '</div>' +
-      '<div class="period-chips">' + chipsHtml + '</div>' +
-      '<div class="period-count">' + cnt + ' œuvres</div></div>';
-    (function(yrs){ row.onclick = function(){ openGallery(yrs,[]); }; })(p.years);
-    pl.appendChild(row);
-  }
 
   /* SÉRIES */
   var sv = document.getElementById('series-view');

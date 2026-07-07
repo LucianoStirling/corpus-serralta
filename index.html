@@ -25,7 +25,11 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
   padding:16px 32px;background:var(--white);border-bottom:1px solid var(--rule);
   position:sticky;top:0;z-index:20}
 .topbar-title{font-size:18px;font-weight:300;letter-spacing:-.3px;cursor:pointer}
-.topbar-count{font-size:12px;color:var(--light);margin-left:12px}
+.topbar-count{font-size:13px;color:var(--mid);margin-left:8px;cursor:pointer;transition:color .15s}.topbar-count:hover{color:var(--ink)}
+.topbar-back{display:inline-flex;align-items:center;gap:6px;margin-left:14px}
+.tback{font-size:11px;color:var(--mid);cursor:pointer;text-decoration:none;opacity:.6}
+.tback:hover{opacity:1;color:var(--ink)}
+.tback-sep{font-size:11px;color:var(--light)}
 .topbar-nav{font-size:13px;color:var(--mid);cursor:pointer;transition:color .15s}
 .topbar-nav:hover{color:var(--ink)}
 
@@ -99,6 +103,13 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .chip:hover{border-color:var(--mid)}
 .chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
 .chip-vsep{width:1px;background:rgba(0,0,0,.15);height:16px;flex-shrink:0;align-self:center;margin:0 4px}
+.period-chips{margin:8px 0 4px;display:flex;flex-wrap:wrap;gap:4px}
+.period-serie-chip{display:inline-flex;align-items:center;gap:4px;background:var(--white);border:1px solid var(--rule);border-radius:3px;padding:3px 8px;font-size:10px;color:var(--mid);cursor:pointer;transition:background .15s}
+.period-serie-chip:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.psc-cnt{font-weight:500;color:var(--gold)}
+.period-serie-chip:hover .psc-cnt{color:#ffd}
+.smc-range{font-size:10px;color:var(--light);margin:2px 0 6px;letter-spacing:.2px}
+.ec-range{font-size:10px;color:var(--light);margin:1px 0 4px}
 .ctx-intro{font-size:13px;color:var(--mid);line-height:1.85;margin-bottom:28px}
 .ctx-intro p{margin:0 0 14px}
 .ctx-intro p:last-child{margin-bottom:0}
@@ -324,12 +335,11 @@ body.admin-on .leaderboard-row{display:flex}
 <div class="topbar" style="display:none" id="topbar">
   <div style="display:flex;align-items:baseline;gap:8px">
     <span class="topbar-title" onclick="goToTab('chrono')">Corpus Serralta</span>
-    <span class="topbar-count" id="main-count"></span>
+    <span class="topbar-count" id="main-count" onclick="openGallery([],[])"></span>
     <span id="topbar-version"></span>
+    <span class="topbar-back"><span class="tback" onclick="goToTab('chrono')">Chronologie</span><span class="tback-sep"> · </span><span class="tback" onclick="goToTab('series')">Séries</span></span>
   </div>
   <div style="display:flex;gap:20px;align-items:center">
-    <span class="topbar-nav" onclick="goToTab('chrono')">Chronologie</span>
-    <span class="topbar-nav" onclick="goToTab('series')">S&#233;ries</span>
     <button class="lock-btn" id="lock-btn" onclick="toggleAdmin()" title="Administration">&#128274;</button>
   </div>
 </div>
@@ -457,32 +467,30 @@ function init() {
 
 /* ── Données contextuelles ── */
 var PERIODS = [
-  { date: '1969 – 1975', title: 'Les prémices',
-    years: ['1969','1974','1975'],
-    desc: 'Une seule œuvre de 1969, une poignée de 1974–75. Serralta est encore ancré dans une figuration de tradition — paysage en perspective, couleur au crayon — sans les caractéristiques formelles qui définiront sa voix propre.' },
-  { date: '1976 – 1978', title: 'L’explosion du trait',
-    years: ['1976','1977','1978'],
-    desc: 'Plus de 360 œuvres en trois ans — un rythme qui ne se reproduira jamais. Le dessin devient quotidien, urgent, compulsif. La ligne s’affermit et se libère simultanément : encre de Chine pure, feutre couleur, grands formats panoramiques. Le nu féminin s’impose comme motif central, les premières apparitions du vocabulaire UNITOR. Serralta a 57 ans, en exil à Paris depuis la dictature Bordaberry (1973).' },
-  { date: '1979 – 1982', title: 'La densité architecturale',
+  { date: '1969 – 1976', title: 'L’établissement',
+    years: ['1969','1974','1975','1976'],
+    desc: 'Les grandes séries ne s’inventent pas progressivement — elles sont toutes présentes en 1976. CIENS-ART, Personnages Filiformes, Animaux, Habillés, Paquebot : tout est là dès la troisième œuvre de 1976. La fin de cette année voit exploser la couleur (aplats rose/rouge/vert/bleu) — le changement de registre qui annonce 1977, pas 1975.' },
+  { date: '1977 – 1978', title: 'Le débordement',
+    years: ['1977','1978'],
+    desc: 'La production se multiplie, mais l’essentiel n’est pas là. Ce qui explose en 1977, c’est le nombre de registres simultanés : peintures à l’aplat saturé, dessins au trait quasi-automatique d’un seul geste, études au crayon quasi-fantomatiques. Ces trois modes coexistent dans la même année sans hiérarchie. 1978 commence à assagir sans unifier — c’est l’année où le corps et le système CIENS-ART se superposent pour la première fois en une même image.' },
+  { date: '1979 – 1982', title: 'Le repli',
     years: ['1979','1980','1981','1982'],
-    desc: 'Les corps s’enchêtrent avec les structures. Les instruments de musique deviennent des architectures, les pianistes fusionnent avec leurs claviers. La tension entre l’organique et le mécanique produit certaines des œuvres les plus conceptuellement denses du corpus.' },
-  { date: '1983 – 1984', title: 'Le retour à la couleur',
-    years: ['1983','1984'],
-    desc: 'En rupture avec la densification formelle qui précède : retour à la couleur vive et à la gestualité aquarellée. Figures équestres au trait minimal, nus dans des paysages turquoise, chevaux bondissants rouge et rose — une période de respiration chromatique.' },
-  { date: '1985 – 1986', title: 'La densification cosmique',
-    years: ['1985','1986'],
-    desc: 'Les compositions retrouvent leur densité, orientées vers le haut : visages couronnés de figures microscopiques, portraits-cosmos où l’individu porte en lui une cartographie intérieure. Le poing fermé, les regards frontaux, les réseaux géométriques superposés aux corps — la période la plus chargée psychologiquement du corpus.' },
-  { date: '1987 – 1988', title: 'Le temps des paquebots',
-    years: ['1987','1988'],
-    desc: 'Un motif nouveau envahit les compositions : le paquebot. Navires très détaillés surgissent dans des paysages de rochers et de falaises déjà habités par des nus féminins. Tension systématique entre le temps mythologique (figure, roche, lune) et le temps mécanique (navire, mouvement, destination).' },
-  { date: '1989', title: 'Le cubisme géométrique',
-    years: ['1989'],
-    desc: 'Serralta pousse la figure humaine jusqu’à sa dissolution dans la géométrie pure. Les personnages sont constitués de cubes et de polyèdres, les espaces deviennent des continuums géométriques. Le moment le plus rigoureusement abstrait d’un corpus foncièrement figuratif.' },
-  { date: '1990 – 2011', title: 'La traversée des styles',
-    years: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999',
-             '2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
-    desc: 'La production se ralentit sans s’arrêter. Deux décennies d’activité régulière, oscillant entre les thèmes fondateurs (nus, musique, UNITOR) et des expérimentations plus tardives en pastel gras ou technique mixte.' }
-];
+    desc: 'Contraction délibérée. Le Personnage Filiforme s’autonomise, la palette se refroidit. En 1982, minimum absolu : quelques dessins et un document dactylographié — le texte de l’Unitor en cours de rédaction — inclus dans le corpus au même titre qu’un dessin. Ce n’est pas un creux : c’est l’architecte théoricien qui reprend la main. Le livre de l’Unitor (collection permanente du MoMA) se prépare ici. Dans le même temps, les premiers visages-sujets apparaissent : plus un visage dans une composition, un visage qui est la composition.' },
+  { date: '1983', title: 'La Diapo-Photo',
+    years: ['1983'],
+    desc: 'Année à part, sans équivalent ailleurs dans le corpus. Serralta dessine directement sur des photographies — parkings vus du ciel, rues, portraits, forêt de Fontainebleau. Les lignes tracées sur la surface argentique ne commentent pas la photo : elles l’activent. La vue aérienne d’un parking avec des lignes d’énergie dessinées sur les voitures (1983_043) renvoie directement au travail d’urbaniste — l’urbaniste qui a pensé à l’échelle d’une ville. Ce médium ne reviendra plus jamais.' },
+  { date: '1984 – 1989', title: 'La maturité',
+    years: ['1984','1985','1986','1987','1988','1989'],
+    desc: 'L’entrée dans cette période est marquée par les illustrations commandées pour le poète Higinio Mena (1984_008–015) — logique illustrative externe, différente de tout ce qui précède et suit. À partir de 1985, le dessin à l’encre noire sur papier blanc s’impose définitivement : ligne assurée, format monumental, visage qui occupe tout le cadre. Deux développements majeurs : la convergence CIENS-ART / Visages (1987_030 — un visage humain inscrit dans les proportions de l’Unitor), et la transformation du Paquebot. Ce n’est plus une forme flottante — à partir de 1988–1989, ce sont des bâtiments-paquebots. Serralta reconstruit en dessin une Cité Radieuse sur laquelle il a travaillé quarante ans plus tôt.' },
+  { date: '1990 – 2001', title: 'La traversée',
+    years: ['1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001'],
+    desc: 'La qualité du dessin devient plus picturale : lavis, couleurs posées, moins de noir pur. La trinité Animaux / Visages / Paquebot se stabilise. Deux images-clés : 1994_012 (spirale CIENS-ART tracée directement sur un visage — synthèse absolue du corpus) et 1997_012 (la formule de l’Unitor annotée sur une photographie de la pyramide de Khéops — le système n’est pas une invention, c’est une redécouverte). En 2001, "CARNAC" inscrit dans une composition — les mégalithes bretons de son lieu de retraite rejoignent Khéops dans le même réseau de lois universelles.' },
+  { date: '2002 – 2011', title: 'L’horizon cosmologique',
+    years: ['2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
+    desc: 'Production rare, œuvres denses. CIENS-ART revient en premier plan, de plus en plus cosmologique. La dernière œuvre du corpus — 2011_001, réalisée l’année de sa mort — est un diagramme CIENS-ART annoté "COSMOS" : cercles concentriques, triangles, nombres, couleurs primaires. Le corpus commence en 1975 avec les premières grilles CIENS-ART. Il se referme sur une cosmologie CIENS-ART. La boucle est fermée.' }
+]
+
+
 
 var SERIES_MAJOR = [
   { name: 'Animaux', desc: 'Chevaux, taureaux, oiseaux rapaces, félins. Souvent en tension ou fusion avec le nu humain. Héritiers de la tradition mythologique, réinterprétés sans narration illustrative.' },
@@ -512,6 +520,34 @@ var SERIES_MAJOR = [
 var BIO_DOC_FILE_ID = '13D9-mJlnZ9j7cfLM90yPJIzozfQSkxUH';
 
 /* ── Count helpers ── */
+function topSeriesForYears(years, n) {
+  var counts = {}, PINNED = ['Couleur','Noir et Blanc','Diapo-Photo'];
+  for (var i=0; i<ITEMS.length; i++) {
+    if (years.indexOf(String(ITEMS[i].annee)) === -1) continue;
+    var tags = (ITEMS[i].serie||'').split('|');
+    for (var j=0; j<tags.length; j++) {
+      var t = tags[j].trim();
+      if (t && PINNED.indexOf(t) === -1) counts[t] = (counts[t]||0)+1;
+    }
+  }
+  var arr = [];
+  for (var k in counts) if (Object.prototype.hasOwnProperty.call(counts,k)) arr.push([k,counts[k]]);
+  arr.sort(function(a,b){return b[1]-a[1];});
+  return arr.slice(0,n);
+}
+function seriesYearRange(name) {
+  var yrs = [], yc = {};
+  for (var i=0; i<ITEMS.length; i++) {
+    var tags = (ITEMS[i].serie||'').split('|').map(function(t){return t.trim();});
+    if (tags.indexOf(name) === -1) continue;
+    var y = parseInt(String(ITEMS[i].annee));
+    if (!isNaN(y)) { yrs.push(y); yc[y] = (yc[y]||0)+1; }
+  }
+  if (!yrs.length) return null;
+  var mn=Math.min.apply(null,yrs), mx=Math.max.apply(null,yrs), pk=null, pc=0;
+  for (var yr in yc) if(yc[yr]>pc){pc=yc[yr];pk=yr;}
+  return {min:mn,max:mx,peak:pk,peakCnt:pc};
+}
 function countForYears(years) {
   var n=0;
   for(var i=0;i<ITEMS.length;i++) if(years.indexOf(String(ITEMS[i].annee))!==-1) n++;
@@ -538,6 +574,14 @@ function buildEntryPage() {
       '<p class="bio-caption">Chronologie autobiographique dessinée de la main de Serralta — âge vs année, de Melo 1919 aux années 2000. On y lit l’exil (1973), la création de CIENS-ART (1976), les années à l’École d’Architecture de Rennes. Archive familiale.</p>';
   }
 
+
+  var intro = document.createElement('div');
+  intro.className = 'ctx-intro';
+  intro.innerHTML = "<p>Architecte, urbaniste et chercheur franco-uruguayen, Justino Serralta (Melo, 1919 — Jullouville, 2011) est contraint à l’exil en France en 1974, lors de la dictature uruguayenne. C’est dans cet exil — à Paris, puis comme enseignant à Saint-Étienne et à Rennes — qu’il produit l’essentiel de ce corpus dessiné, plus de 1 200 œuvres réalisées entre 1976 et 2011.</p>"
+    + "<p>La figure humaine en est le motif central et quasi-absolu. Elle y apparaît le plus souvent nue — non par provocation, mais parce que la nudité efface les marqueurs de classe, de statut et de métier. C’est l’inverse qui signale quelque chose : quand un personnage est habillé, il devient porteur d’une symbolique précise — militaire, prêtre, figure d’autorité. Cette logique explique que le corpus n’ait pas de série « Nus » : c’est « Habillés » qui est la série, parce que le vêtement, lui, fait sens. Il existe bien des œuvres traitant de la volupté et du désir, mais elles sont étonnamment rares au regard de l’ensemble.</p>"
+    + "<p>CIENS-ART est l’expression plastique de l’Unitor, le système de pensée que Serralta développe à partir des années 1970 pour relier architecture, science, art et société — un outil conceptuel dont le livre fondateur entre dans la collection permanente du MoMa. Cercles d’énergie, grilles de forces, cartographies cosmologiques : CIENS-ART est le langage universel mis en images.</p>";
+  cv.insertBefore(intro, cv.querySelector('.chrono-layout'));
+
   var pl = document.getElementById('period-list');
   for (pi=0; pi<PERIODS.length; pi++) {
     var p = PERIODS[pi];
@@ -545,9 +589,16 @@ function buildEntryPage() {
     if (!cnt) continue;
     var row = document.createElement('div');
     row.className = 'period-row';
+    var topS = topSeriesForYears(p.years, 3);
+    var chipsHtml = topS.map(function(s){
+      var yrs  = JSON.stringify(p.years).replace(/"/g,"'");
+      var snm2 = JSON.stringify([s[0]]).replace(/"/g,"'");
+      return '<span class="period-serie-chip" onclick="event.stopPropagation();openGallery('+yrs+','+snm2+')">'+esc(s[0])+' <span class="psc-cnt">'+s[1]+'</span></span>';
+    }).join('');
     row.innerHTML = '<div class="period-date">' + p.date + '</div>' +
       '<div><div class="period-title">' + p.title + '</div>' +
       '<div class="period-desc">' + p.desc + '</div>' +
+      '<div class="period-chips">' + chipsHtml + '</div>' +
       '<div class="period-count">' + cnt + ' œuvres</div></div>';
     (function(yrs){ row.onclick = function(){ openGallery(yrs,[]); }; })(p.years);
     pl.appendChild(row);
@@ -557,12 +608,6 @@ function buildEntryPage() {
   var sv = document.getElementById('series-view');
   sv.innerHTML = '<p class="ctx-label">Les grandes séries thématiques</p>';
 
-  var intro = document.createElement('div');
-  intro.className = 'ctx-intro';
-  intro.innerHTML = "<p>Architecte, urbaniste et chercheur franco-uruguayen, Justino Serralta (Melo, 1919 — Jullouville, 2011) est contraint à l’exil en France en 1974, lors de la dictature uruguayenne. C’est dans cet exil — à Paris, puis comme enseignant à Saint-Étienne et à Rennes — qu’il produit l’essentiel de ce corpus dessiné, plus de 1 200 œuvres réalisées entre 1976 et 2011.</p>"
-    + "<p>La figure humaine en est le motif central et quasi-absolu. Elle y apparaît le plus souvent nue — non par provocation, mais parce que la nudité efface les marqueurs de classe, de statut et de métier. C’est l’inverse qui signale quelque chose : quand un personnage est habillé, il devient porteur d’une symbolique précise — militaire, prêtre, figure d’autorité. Cette logique explique que le corpus n’ait pas de série « Nus » : c’est « Habillés » qui est la série, parce que le vêtement, lui, fait sens. Il existe bien des œuvres traitant de la volupté et du désir, mais elles sont étonnamment rares au regard de l’ensemble.</p>"
-    + "<p>CIENS-ART est l’expression plastique de l’Unitor, le système de pensée que Serralta développe à partir des années 1970 pour relier architecture, science, art et société — un outil conceptuel dont le livre fondateur entre dans la collection permanente du MoMa. Cercles d’énergie, grilles de forces, cartographies cosmologiques : CIENS-ART est le langage universel mis en images.</p>";
-  sv.appendChild(intro);
 
   var descMap = {};
   for (i=0; i<SERIES_MAJOR.length; i++) descMap[SERIES_MAJOR[i].name] = SERIES_MAJOR[i].desc;
@@ -587,8 +632,11 @@ function buildEntryPage() {
   for (i=0; i<top5.length; i++) {
     var scard = document.createElement('div');
     scard.className = 'smc';
+    var _rng = seriesYearRange(top5[i][0]);
+    var _rngHtml = _rng ? '<div class="smc-range">' + _rng.min + (_rng.max!==_rng.min?'–'+_rng.max:'') + ' · pic ' + _rng.peak + '</div>' : '';
     scard.innerHTML = '<div class="smc-title">'+esc(top5[i][0])+'</div>' +
       '<div class="smc-n">'+top5[i][1]+'</div>' +
+      _rngHtml +
       '<div class="smc-desc">'+(descMap[top5[i][0]]||'')+'</div>';
     (function(nm){ scard.onclick = function(){ openGallery([],[nm]); }; })(top5[i][0]);
     mg.appendChild(scard);
@@ -618,8 +666,11 @@ function buildEntryPage() {
     var snm=sorted[sri][0], scnt=sorted[sri][1];
     if (top5names[snm]) continue;
     var ac = document.createElement('div'); ac.className='entry-card';
+    var _rng2 = seriesYearRange(snm);
+    var _rngHtml2 = _rng2 ? '<div class="ec-range">' + _rng2.min + (_rng2.max!==_rng2.min?'–'+_rng2.max:'') + ' · pic ' + _rng2.peak + '</div>' : '';
     ac.innerHTML = '<div class="entry-card-title">'+esc(snm)+'</div>' +
       '<div class="entry-card-count">'+scnt+' œuvres</div>' +
+      _rngHtml2 +
       (descMap[snm]?'<div class="entry-card-desc">'+descMap[snm]+'</div>':'');
     (function(nm){ ac.onclick = function(){ openGallery([],[nm]); }; })(snm);
     ag.appendChild(ac);

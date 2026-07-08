@@ -518,7 +518,7 @@ var SERIES_MAJOR = [
   { name: 'Manuscrit', desc: 'Œuvres intégrant texte manuscrit : poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
   { name: 'Supports Divers', desc: 'Tout ce qui n’est pas le papier Canson habituel : carton, polystyrène, enveloppes, matériaux récupérés. Le support n’est jamais anodin, il altère le tracé, contraint le geste, transforme la surface en co-auteur de l’image.' },
   { name: 'Martelés', desc: 'Technique propre à Serralta : la reproduction photographique d’un dessin est collée sur une plaque de mousse expansive, puis martelée à la main pour créer un relief en creux. De l’encre est souvent ajoutée dans les zones martelées, révélant l’empreinte du geste. À mi-chemin entre dessin, estampe et sculpture.' },
-  { name: 'Diapo-Photo', desc: 'Œuvres incluant des photos, ainsi que le travail sur diapositives (série à part entière également).' },
+  { name: 'Diapo-Photo', desc: 'Œuvres incluant des photos, ainsi que le travail sur diapositives.' },
   { name: 'Diapogravure', desc: 'Technique unique : travail direct sur diapositives 35 mm.' },
   { name: 'Personnages Filiformes', desc: 'Serralta efface la masse des corps et réduit la figure à un tracé minimal, linéaire. Ce dépouillement détonne par rapport au caractère plantureux et charnel de la majorité de son œuvre.' },
   { name: 'Politique', desc: 'Les militaires, les drapeaux, les armes, les scènes de torture. Trace de l’exil et de la dictature uruguayenne, une présence rare mais explicite dans un corpus plutôt cosmologique.' },
@@ -941,6 +941,12 @@ function filterItems() {
 
 function renderGallery() {
   var filtered=filterItems();
+  filtered.sort(function(a,b){
+    var aSD=String(a.ref).indexOf('SansDate')===0?1:0;
+    var bSD=String(b.ref).indexOf('SansDate')===0?1:0;
+    if(aSD!==bSD) return aSD-bSD;
+    return String(a.ref)<String(b.ref)?-1:String(a.ref)>String(b.ref)?1:0;
+  });
   document.getElementById('filter-count').textContent=filtered.length+' / '+ITEMS.length+' œuvres';
   var nVer=0; for(var vi=0;vi<ITEMS.length;vi++) if(ITEMS[vi].verifie) nVer++;
   var vc=document.getElementById('ver-count'); if(vc) vc.textContent=nVer+' / '+ITEMS.length+' vérifiés';
@@ -986,7 +992,7 @@ function renderGallery() {
 
 function addSerieFilter(s) {
   sAdd(activeSeries,s);
-  document.querySelectorAll('#serie-chips .chip').forEach(function(c){
+  document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c){
     if(c.getAttribute('data-s')===s) c.className='chip active';
   });
   enforceMinFilter(); renderGallery();

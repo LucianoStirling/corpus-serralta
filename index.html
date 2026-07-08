@@ -532,7 +532,7 @@ var SERIES_MAJOR = [
   { name: 'Illustrations Higinio Mena', desc: 'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena. Seule collaboration éditoriale documentée de Serralta.' },
   { name: 'Série peintures', desc: 'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.' },
   { name: 'Sculptures', desc: 'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.' },
-  { name: 'Croquis de voyage', desc: 'Voyage d'études en Europe d'un jeune architecte uruguayen de 28 ans. Entre 1947 et 1960, Serralta (né en 1919) parcourt la France, l'Italie et l'Espagne, carnet en main : cathédrales gothiques, places italiennes, ponts parisiens, relevés cotés. Ces 209 dessins à l'encre ou au crayon, antérieurs à tout le reste du corpus, sont le seul témoignage visuel de sa formation européenne — avant l'exil, avant la dictature, avant SCIENS-ART.' }
+  { name: 'Croquis de voyage', desc: 'Voyage d’études en Europe d’un jeune architecte uruguayen de 28 ans. Entre 1947 et 1960, Serralta (né en 1919) parcourt la France, l’Italie et l’Espagne, carnet en main : cathédrales gothiques, places italiennes, ponts parisiens, relevés cotés. Ces 209 dessins à l’encre ou au crayon, antérieurs à tout le reste du corpus, sont le seul témoignage visuel de sa formation européenne — avant l’exil, avant la dictature, avant SCIENS-ART.' }
 ];
 
 var BIO_DOC_FILE_ID = '13D9-mJlnZ9j7cfLM90yPJIzozfQSkxUH';
@@ -649,7 +649,7 @@ function buildEntryPage() {
       if (sp) scountTop[sp] = (scountTop[sp]||0)+1;
     }
   }
-  var HIDDEN_SERIES = ['Couleur', 'Noir et Blanc', 'Nus'];
+  var HIDDEN_SERIES = ['Couleur', 'Noir et Blanc', 'Nus', 'France', 'Italie', 'Espagne'];
   var sortedTop = [];
   for (var k in scountTop) if(sHas(scountTop,k)&&HIDDEN_SERIES.indexOf(k)===-1) sortedTop.push([k,scountTop[k]]);
   sortedTop.sort(function(a,b){return b[1]-a[1];});

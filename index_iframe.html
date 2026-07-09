@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Corpus Serralta</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<style>
+:root{
+  --ink:#1a1a1a;--mid:#555;--light:#999;--rule:#e8e8e6;
+  --bg:#f7f7f5;--white:#fff;--accent:#c8a96e;--nav-h:48px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink)}
+
+/* ── NAV ONGLETS ── */
+#main-nav{display:flex;border-bottom:2px solid var(--rule);background:var(--white);
+  position:sticky;top:0;z-index:20;height:var(--nav-h);align-items:center}
+.main-tab{padding:0 28px;height:100%;font-size:13px;cursor:pointer;color:var(--light);
+  border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;
+  transition:all .15s;font-family:inherit}
+.main-tab.active{color:var(--ink);border-color:var(--ink);font-weight:500}
+
+/* ── FILTRES ── */
+.filters{padding:8px 24px;background:var(--white);border-bottom:1px solid var(--rule);
+  display:flex;flex-direction:column;gap:5px;position:sticky;top:var(--nav-h);z-index:18}
+.filter-row{display:flex;align-items:center;gap:8px;min-width:0}
+.filter-chips-scroll{display:flex;gap:6px;overflow-x:auto;flex-wrap:nowrap;
+  scrollbar-width:none;-ms-overflow-style:none;padding-bottom:1px;min-width:0}
+.filter-chips-scroll::-webkit-scrollbar{display:none}
+.filter-label{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--light);
+  white-space:nowrap;flex-shrink:0;width:46px}
+.chip{font-size:11px;padding:4px 12px;border:1px solid var(--rule);border-radius:20px;
+  cursor:pointer;background:var(--white);color:var(--mid);transition:all .15s;white-space:nowrap;
+  flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.chip:hover{border-color:var(--mid)}
+.chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.chip-vsep{width:1px;background:rgba(0,0,0,.15);height:16px;flex-shrink:0;align-self:center;margin:0 4px}
+.filter-search-row{display:flex;align-items:center;gap:10px;padding:2px 0 4px}
+.filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
+  padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
+  background:var(--white);outline:none;transition:border-color .15s;min-width:0}
+.filter-search:focus{border-color:var(--mid)}
+.filter-search::placeholder{color:var(--light)}
+#filter-count{font-size:11px;color:var(--light);white-space:nowrap}
+.clear-btn{font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;white-space:nowrap}
+
+/* ── GALERIE ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;padding:2px}
+.card{background:var(--white);display:flex;flex-direction:column;position:relative}
+.card-img{overflow:hidden;background:#f0f0ee;cursor:zoom-in}
+.card-img img{width:100%;display:block;transition:opacity .2s}
+.card-img img:hover{opacity:.9}
+.card-body{padding:8px 10px;flex:1;display:flex;flex-direction:column;gap:4px}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px}
+.tag{font-size:10px;padding:2px 8px;border-radius:12px;background:#f0f0ec;color:var(--mid);
+  cursor:pointer;transition:background .1s}
+.tag:hover{background:#e0e0db}
+.card-ref{font-size:11px;font-weight:600}
+.card-tech{font-size:11px;color:var(--light)}
+
+/* ── COLLECTIONS ── */
+.coll-view{padding:32px 24px}
+.coll-section{margin-bottom:48px}
+.coll-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--light);margin-bottom:20px}
+.coll-divider{border:none;border-top:1px solid var(--rule);margin-bottom:32px}
+
+/* Grandes séries */
+.series-major-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule)}
+.smc{background:var(--white);padding:22px 20px;cursor:pointer;transition:background .12s}
+.smc:hover{background:var(--bg)}
+.smc-title{font-size:14px;font-weight:500;margin-bottom:4px}
+.smc-range{font-size:10px;color:var(--light);margin:2px 0 6px;letter-spacing:.2px}
+.smc-n{font-size:38px;font-weight:300;color:var(--accent);line-height:1.1;
+  margin-bottom:8px;font-variant-numeric:tabular-nums}
+.smc-desc{font-size:12px;color:var(--mid);line-height:1.65}
+
+/* Toutes séries + Périodes */
+.series-all-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.entry-card{background:var(--white);border:1px solid var(--rule);border-radius:3px;
+  padding:20px;cursor:pointer;transition:all .15s;text-align:center}
+.entry-card:hover{border-color:var(--ink);transform:translateY(-2px)}
+.entry-card-title{font-size:16px;font-weight:300;margin-bottom:4px}
+.entry-card-count{font-size:12px;color:var(--light)}
+.entry-card-event{font-size:11px;color:var(--accent);margin-top:6px;font-style:italic}
+.entry-card-desc{font-size:11px;color:var(--light);line-height:1.5;margin-top:8px;text-align:left}
+.ec-range{font-size:10px;color:var(--light);margin:1px 0 4px}
+
+/* ── LIGHTBOX ── */
+#lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;
+  align-items:center;justify-content:center}
+#lb.open{display:flex}
+#lb img{max-width:90vw;max-height:90vh;object-fit:contain}
+#lb-close{position:fixed;top:18px;right:22px;color:#888;font-size:26px;
+  cursor:pointer;background:none;border:none}
+
+/* ── LOADING ── */
+#loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;z-index:200}
+.spinner{width:32px;height:32px;border:2px solid var(--rule);
+  border-top-color:var(--ink);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+#loading p{font-size:13px;color:var(--light)}
+#loading small{font-size:10px;color:#bbb}
+.err-msg{color:#c00;font-size:13px;max-width:400px;text-align:center;line-height:1.6}
+
+/* ── RESPONSIVE ── */
+@media(max-width:800px){
+  .filters{padding:6px 16px}
+  .series-major-grid{grid-template-columns:repeat(2,1fr)}
+  .series-all-grid{grid-template-columns:repeat(2,1fr)}
+  .coll-view{padding:24px 16px}
+}
+@media(max-width:480px){
+  .grid{grid-template-columns:1fr}
+  .series-major-grid{grid-template-columns:1fr}
+  .series-all-grid{grid-template-columns:1fr}
+  .chip{font-size:12px;padding:5px 10px}
+}
+</style>
+</head>
+<body>
+
+<div id="loading">
+  <div class="spinner"></div>
+  <p id="load-msg">Chargement du corpus&#8230;</p>
+  <small id="load-sub"></small>
+</div>
+
+<nav id="main-nav" style="display:none">
+  <button class="main-tab active" onclick="switchMainTab('galerie')">Galerie</button>
+  <button class="main-tab" onclick="switchMainTab('collections')">Collections</button>
+</nav>
+
+<!-- ONGLET GALERIE -->
+<div id="galerie-tab">
+  <div class="filters">
+    <div class="filter-row">
+      <span class="filter-label">Ann&#233;es</span>
+      <div class="filter-chips-scroll" id="year-chips"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label" style="font-size:9px">Style</span>
+      <div class="filter-chips-scroll" id="serie-chips-class"></div>
+    </div>
+    <div class="filter-row">
+      <span class="filter-label">S&#233;ries</span>
+      <div class="filter-chips-scroll" id="serie-chips-theme"></div>
+    </div>
+    <div class="filter-search-row">
+      <input type="search" class="filter-search" id="search-input"
+        placeholder="Rechercher&#8230;" oninput="onSearch(this.value)">
+      <span id="filter-count"></span>
+      <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn">Effacer</span>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<!-- ONGLET COLLECTIONS -->
+<div id="collections-tab" style="display:none">
+  <div class="coll-view" id="coll-view"></div>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="lb">
+  <img id="lb-img" src="" alt="">
+  <button id="lb-close" onclick="closeLB()">&#x2715;</button>
+</div>
+
+<script>
+/* ================================================================
+   CORPUS SERRALTA — iframe embed (unitorserralta)
+   2 onglets : Galerie | Collections
+   ================================================================ */
+var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
+var API_URL  = API_BASE + '?api=1';
+
+var ITEMS = [], SHEET_ID = '', GID = '', APP_VERSION = '';
+var activeYears = {}, activeSeries = {}, searchQuery = '';
+
+var PINNED_TAGS = ['Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
+var SANS_TAG_KEY = '__aucun__';
+
+/* ── Helpers ── */
+function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
+function sAdd(o,k){o[String(k)]=true}
+function sDel(o,k){delete o[String(k)]}
+function sSize(o){return Object.keys(o).length}
+function sClear(o){var ks=Object.keys(o);for(var i=0;i<ks.length;i++)delete o[ks[i]]}
+function sFromArr(a){var o={};if(a)for(var i=0;i<a.length;i++)o[String(a[i])]=true;return o}
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+/* ── Données ── */
+var SERIES_MAJOR = [
+  { name: 'Animaux',               desc: 'Chevaux, taureaux, oiseaux, chiens… Souvent en tension ou fusion avec le nu humain.' },
+  { name: 'Visages',               desc: 'Les visages où les détails sont travaillés avec précision, en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.' },
+  { name: 'SCIENS-ART',            desc: 'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes, une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.' },
+  { name: 'Musique',               desc: 'Pianistes, violoncellistes, bandónistes, violonistes. Les musiciens fusionnent avec leurs instruments jusqu’à la dissolution formelle. Lien profond avec la culture rioplatense.' },
+  { name: 'Paquebot',              desc: 'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement, motif autobiographique discret.' },
+  { name: 'Portraits',             desc: 'Visages très travaillés représentant proches ou personnes connues, regards frontaux d’une intensité inhabituelle.' },
+  { name: 'Manuscrit',             desc: 'Œuvres intégrant texte manuscrit : poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
+  { name: 'Supports Divers',       desc: 'Tout ce qui n’est pas le papier Canson habituel : carton, polystyrène, enveloppes, matériaux récupérés. Le support n’est jamais anodin, il altère le tracé, contraint le geste, transforme la surface en co-auteur de l’image.' },
+  { name: 'Martelés',         desc: 'Technique propre à Serralta : la reproduction photographique d’un dessin est collée sur une plaque de mousse expansive, puis martelée à la main pour créer un relief en creux. De l’encre est souvent ajoutée dans les zones martelées, révélant l’empreinte du geste. À mi-chemin entre dessin, estampe et sculpture.' },
+  { name: 'Diapo-Photo',           desc: 'Œuvres incluant des photos, ainsi que le travail sur diapositives.' },
+  { name: 'Diapogravure',          desc: 'Technique unique : travail direct sur diapositives 35 mm.' },
+  { name: 'Personnages Filiformes', desc: 'Serralta efface la masse des corps et réduit la figure à un tracé minimal, linéaire. Ce dépouillement détonne par rapport au caractère plantureux et charnel de la majorité de son œuvre.' },
+  { name: 'Politique',             desc: 'Les militaires, les drapeaux, les armes, les scènes de torture. Trace de l’exil et de la dictature uruguayenne, une présence rare mais explicite dans un corpus plutôt cosmologique.' },
+  { name: 'Habillés',         desc: 'Contrepoint aux nus omniprésents : chez Serralta, la nudité est l’état naturel. Un personnage habillé devient souvent porteur d’une symbolique (militaires, figures d’autorité…).' },
+  { name: 'Urbanisme',             desc: 'Paysages reconnaissables, croquis architecturaux, vues urbaines. Les rares moments où Serralta ancre la composition dans un espace géographique identifiable.' },
+  { name: 'Mise en abyme',         desc: 'La main, le doigt ou le stylo de l’artiste apparaît dans le dessin en train de dessiner. Geste réflexif classique, rare chez Serralta mais toujours délibéré.' },
+  { name: 'Sport',                 desc: 'Football, champs de courses, compétitions. Hommage à la culture populaire rioplatense, thème festif.' },
+  { name: 'Nus',                   desc: 'Motif le plus constant, présent dès 1976 et jamais abandonné. Corps multiple, frontal, intégré à la nature ou confronté à l’animal. Le nu est pour Serralta une syntaxe autant qu’un sujet.' },
+  { name: 'Études',           desc: 'Recherches formelles préparatoires ou autonomes : esquisses de figures, études de mains et de visages. Le laboratoire visible de la pratique de Serralta.' },
+  { name: 'Dédicaces',        desc: 'Œuvres offertes et dédicacées. Révèlent le réseau amical et intellectuel de Serralta : musiciens, architectes, poètes, famille.' },
+  { name: 'Illustrations Higinio Mena', desc: 'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena. Seule collaboration éditoriale documentée de Serralta.' },
+  { name: 'Série peintures',  desc: 'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.' },
+  { name: 'Sculptures',            desc: 'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.' },
+  { name: 'Croquis de voyage',     desc: 'Voyage d’études en Europe d’un jeune architecte uruguayen de 28 ans. Entre 1947 et 1960, Serralta (né en 1919) parcourt la France, l’Italie et l’Espagne, carnet en main : cathédrales gothiques, places italiennes, ponts parisiens, relevés cotés. Ces 209 dessins à l’encre ou au crayon, antérieurs à tout le reste du corpus, sont le seul témoignage visuel de sa formation européenne — avant l’exil, avant la dictature, avant SCIENS-ART.' }
+];
+
+/* Périodes chronologiques (ordre chronologique = plus lisible en cards) */
+var CHRONO_YRS = [
+  ["1940–1960", ["1940","1941","1942","1943","1944","1945","1946","1947","1948","1949","1950","1951","1952","1953","1954","1955","1956","1957","1958","1959","1960"], "Voyages en Europe"],
+  ["1961–1970", ["1961","1962","1963","1964","1965","1966","1967","1968","1969","1970"], null],
+  ["1970–1975", ["1970","1971","1972","1973","1974","1975"], "Dictature et exil"],
+  ["1976–1978", ["1976","1977","1978"], "École d’Architecture de St-Étienne"],
+  ["1979–1981", ["1979","1980","1981"], "Unitor"],
+  ["1982–1984", ["1982","1983","1984"], "École d’Architecture de Rennes"],
+  ["1985–1987", ["1985","1986","1987"], null],
+  ["1988–1990", ["1988","1989","1990"], "Normandie"],
+  ["1991–1993", ["1991","1992","1993"], "Libération Charles"],
+  ["1994–1996", ["1994","1995","1996"], null],
+  ["1997–1999", ["1997","1998","1999"], "Retraite"],
+  ["2000–2002", ["2000","2001","2002"], null],
+  ["2003–2005", ["2003","2004","2005"], null],
+  ["2006–2008", ["2006","2007","2008"], null],
+  ["2009–2011", ["2009","2010","2011"], null]
+];
+
+/* ── Startup ── */
+document.addEventListener('DOMContentLoaded', startApp);
+
+function startApp() {
+  var msg = document.getElementById('load-msg');
+  var sub = document.getElementById('load-sub');
+  if (sub) sub.textContent = 'Connexion au catalogue…';
+  fetch(API_URL)
+    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+    .then(function(resp) {
+      if (msg) msg.textContent = 'Chargement de ' + resp.items.length + ' œuvres…';
+      ITEMS = resp.items.map(function(a) {
+        return { ref:a[0], annee:a[1], technique:a[2], support:a[3],
+                 serie:a[4], ico:a[5], crit:a[6], image_url:a[7], _row:a[8] };
+      });
+      SHEET_ID = resp.sheetId; GID = resp.gid; APP_VERSION = resp.version || '';
+      init();
+    })
+    .catch(function(err) {
+      if (msg) { msg.className = 'err-msg'; msg.textContent = 'Impossible de charger le catalogue.'; }
+      if (sub) sub.textContent = err.message;
+    });
+}
+
+function init() {
+  document.getElementById('loading').style.display = 'none';
+  document.getElementById('main-nav').style.display = 'flex';
+  buildFilterChips();
+  buildCollections();
+  renderGallery();
+}
+
+/* ── Helpers comptage ── */
+function seriesYearRange(name) {
+  var yrs = [], yc = {};
+  for (var i = 0; i < ITEMS.length; i++) {
+    var tags = (ITEMS[i].serie || '').split('|').map(function(t) { return t.trim(); });
+    if (tags.indexOf(name) === -1) continue;
+    var y = parseInt(String(ITEMS[i].annee));
+    if (!isNaN(y)) { yrs.push(y); yc[y] = (yc[y] || 0) + 1; }
+  }
+  if (!yrs.length) return null;
+  var mn = Math.min.apply(null, yrs), mx = Math.max.apply(null, yrs);
+  return { min: mn, max: mx };
+}
+function countForYears(years) {
+  var n = 0;
+  for (var i = 0; i < ITEMS.length; i++)
+    if (years.indexOf(String(ITEMS[i].annee)) !== -1) n++;
+  return n;
+}
+
+/* ── Construction onglet Collections ── */
+function buildCollections() {
+  var cv = document.getElementById('coll-view');
+  cv.innerHTML = '';
+  var i;
+  var HIDDEN = ['Couleur', 'Noir et Blanc', 'Nus', 'France', 'Italie', 'Espagne'];
+
+  /* Comptage global */
+  var scountAll = {};
+  for (i = 0; i < ITEMS.length; i++) {
+    var pts = (ITEMS[i].serie || '').split('|');
+    for (var j = 0; j < pts.length; j++) {
+      var sp = pts[j].trim();
+      if (sp) scountAll[sp] = (scountAll[sp] || 0) + 1;
+    }
+  }
+
+  /* Top 5 (hors HIDDEN) */
+  var sortedAll = [];
+  for (var k in scountAll)
+    if (sHas(scountAll, k) && HIDDEN.indexOf(k) === -1) sortedAll.push([k, scountAll[k]]);
+  sortedAll.sort(function(a, b) { return b[1] - a[1]; });
+  var top5 = sortedAll.slice(0, 5);
+  var top5names = {};
+  for (i = 0; i < top5.length; i++) top5names[top5[i][0]] = true;
+
+  /* descMap */
+  var descMap = {};
+  for (i = 0; i < SERIES_MAJOR.length; i++) descMap[SERIES_MAJOR[i].name] = SERIES_MAJOR[i].desc;
+
+  /* ─────────────────────────────────────────
+     Section 1 : Grandes séries (smc top 5)
+  ───────────────────────────────────────── */
+  var s1 = document.createElement('div'); s1.className = 'coll-section';
+  var t1 = document.createElement('p'); t1.className = 'coll-title';
+  t1.textContent = 'Les grandes séries';
+  s1.appendChild(t1);
+  var mg = document.createElement('div'); mg.className = 'series-major-grid';
+  for (i = 0; i < top5.length; i++) {
+    var sc = document.createElement('div'); sc.className = 'smc';
+    var rng = seriesYearRange(top5[i][0]);
+    var rngH = rng ? '<div class="smc-range">' + rng.min + (rng.max !== rng.min ? '–' + rng.max : '') + '</div>' : '';
+    sc.innerHTML = '<div class="smc-title">' + esc(top5[i][0]) + '</div>' +
+      '<div class="smc-n">' + top5[i][1] + '</div>' + rngH +
+      '<div class="smc-desc">' + (descMap[top5[i][0]] || '') + '</div>';
+    (function(nm) { sc.onclick = function() { openGallery([], [nm]); }; })(top5[i][0]);
+    mg.appendChild(sc);
+  }
+  s1.appendChild(mg);
+  cv.appendChild(s1);
+
+  /* ─────────────────────────────────────────
+     Section 2 : Toutes les séries (entry-card)
+  ───────────────────────────────────────── */
+  var s2 = document.createElement('div'); s2.className = 'coll-section';
+  var hr1 = document.createElement('hr'); hr1.className = 'coll-divider'; s2.appendChild(hr1);
+  var t2 = document.createElement('p'); t2.className = 'coll-title';
+  t2.textContent = 'Toutes les séries';
+  s2.appendChild(t2);
+  var ag = document.createElement('div'); ag.className = 'series-all-grid';
+  for (var sri = 0; sri < sortedAll.length; sri++) {
+    var snm = sortedAll[sri][0], scnt = sortedAll[sri][1];
+    if (top5names[snm]) continue;
+    var ac = document.createElement('div'); ac.className = 'entry-card';
+    var rng2 = seriesYearRange(snm);
+    var rngH2 = rng2 ? '<div class="ec-range">' + rng2.min + (rng2.max !== rng2.min ? '–' + rng2.max : '') + '</div>' : '';
+    ac.innerHTML = '<div class="entry-card-title">' + esc(snm) + '</div>' +
+      '<div class="entry-card-count">' + scnt + ' œuvres</div>' + rngH2 +
+      (descMap[snm] ? '<div class="entry-card-desc">' + descMap[snm] + '</div>' : '');
+    (function(nm) { ac.onclick = function() { openGallery([], [nm]); }; })(snm);
+    ag.appendChild(ac);
+  }
+  s2.appendChild(ag);
+  cv.appendChild(s2);
+
+  /* ─────────────────────────────────────────
+     Section 3 : Périodes (entry-card)
+  ───────────────────────────────────────── */
+  var s3 = document.createElement('div'); s3.className = 'coll-section';
+  var hr2 = document.createElement('hr'); hr2.className = 'coll-divider'; s3.appendChild(hr2);
+  var t3 = document.createElement('p'); t3.className = 'coll-title';
+  t3.textContent = 'Périodes';
+  s3.appendChild(t3);
+  var pg = document.createElement('div'); pg.className = 'series-all-grid';
+  for (i = 0; i < CHRONO_YRS.length; i++) {
+    var cy = CHRONO_YRS[i], lbl = cy[0], yrs = cy[1], ev = cy[2];
+    var cnt = countForYears(yrs);
+    var pc = document.createElement('div'); pc.className = 'entry-card';
+    pc.innerHTML = '<div class="entry-card-title">' + esc(lbl) + '</div>' +
+      '<div class="entry-card-count">' + cnt + ' œuvres</div>' +
+      (ev ? '<div class="entry-card-event">' + esc(ev) + '</div>' : '');
+    (function(y) { pc.onclick = function() { openGallery(y, []); }; })(yrs);
+    pg.appendChild(pc);
+  }
+  s3.appendChild(pg);
+  cv.appendChild(s3);
+}
+
+/* ── Onglets ── */
+function switchMainTab(tab) {
+  var btns = document.querySelectorAll('.main-tab');
+  btns[0].className = 'main-tab' + (tab === 'galerie'     ? ' active' : '');
+  btns[1].className = 'main-tab' + (tab === 'collections' ? ' active' : '');
+  document.getElementById('galerie-tab').style.display     = tab === 'galerie'     ? 'block' : 'none';
+  document.getElementById('collections-tab').style.display = tab === 'collections' ? 'block' : 'none';
+}
+
+/* ── Ouvrir galerie filtrée (depuis Collections) ── */
+function openGallery(years, series) {
+  activeYears = sFromArr(years); activeSeries = sFromArr(series);
+  switchMainTab('galerie');
+  document.querySelectorAll('#year-chips .chip').forEach(function(c) {
+    c.className = sHas(activeYears, c.getAttribute('data-y')) ? 'chip active' : 'chip';
+  });
+  document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c) {
+    c.className = sHas(activeSeries, c.getAttribute('data-s')) ? 'chip active' : 'chip';
+  });
+  enforceMinFilter(); renderGallery();
+  window.scrollTo(0, 0);
+}
+
+/* ── Chips filtres ── */
+function buildFilterChips() {
+  var i, ymap = {}, years = [];
+  for (i = 0; i < ITEMS.length; i++) {
+    var yr = String(ITEMS[i].annee);
+    if (!ymap[yr]) { ymap[yr] = true; years.push(yr); }
+  }
+  years.sort();
+  var yc = document.getElementById('year-chips');
+  for (i = 0; i < years.length; i++) {
+    var yb = document.createElement('button');
+    yb.className = 'chip'; yb.setAttribute('data-y', years[i]); yb.textContent = years[i];
+    (function(y, b) { b.onclick = function() { toggleYear(y, b); }; })(years[i], yb);
+    yc.appendChild(yb);
+  }
+
+  /* Comptage séries thématiques */
+  var scount2 = {};
+  for (i = 0; i < ITEMS.length; i++) {
+    var pts = (ITEMS[i].serie || '').split('|');
+    for (var j = 0; j < pts.length; j++) {
+      var sv = pts[j].trim();
+      if (sv && PINNED_TAGS.indexOf(sv) === -1) scount2[sv] = (scount2[sv] || 0) + 1;
+    }
+  }
+  var skeys = [];
+  for (var sk in scount2) if (sHas(scount2, sk)) skeys.push(sk);
+  skeys.sort(function(a, b) { return scount2[b] - scount2[a]; });
+
+  function makeChip(key, label) {
+    var b = document.createElement('button');
+    b.className = 'chip'; b.setAttribute('data-s', key); b.textContent = label;
+    (function(k, btn) { btn.onclick = function() { toggleSerie(k, btn); }; })(key, b);
+    return b;
+  }
+
+  /* Ligne Style : PINNED_TAGS uniquement */
+  var sc1 = document.getElementById('serie-chips-class');
+  for (i = 0; i < PINNED_TAGS.length; i++) sc1.appendChild(makeChip(PINNED_TAGS[i], PINNED_TAGS[i]));
+
+  /* Ligne Séries : thématiques triées par count */
+  var sc2 = document.getElementById('serie-chips-theme');
+  for (i = 0; i < skeys.length; i++) sc2.appendChild(makeChip(skeys[i], skeys[i]));
+}
+
+function toggleYear(y, btn) {
+  if (sHas(activeYears, y)) { sDel(activeYears, y); btn.className = 'chip'; }
+  else { sAdd(activeYears, y); btn.className = 'chip active'; }
+  enforceMinFilter(); renderGallery();
+}
+function toggleSerie(s, btn) {
+  if (sHas(activeSeries, s)) { sDel(activeSeries, s); btn.className = 'chip'; }
+  else { sAdd(activeSeries, s); btn.className = 'chip active'; }
+  enforceMinFilter(); renderGallery();
+}
+function enforceMinFilter() {
+  var active = sSize(activeYears) > 0 || sSize(activeSeries) > 0 || searchQuery.length > 0;
+  document.getElementById('clear-btn').style.display = active ? 'inline' : 'none';
+}
+function onSearch(val) { searchQuery = val.trim().toLowerCase(); enforceMinFilter(); renderGallery(); }
+function clearFilters() {
+  sClear(activeYears); sClear(activeSeries); searchQuery = '';
+  var si = document.getElementById('search-input'); if (si) si.value = '';
+  document.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
+  enforceMinFilter(); renderGallery();
+}
+
+/* ── Filtrage + rendu ── */
+function filterItems() {
+  var noYear = !sSize(activeYears), noSerie = !sSize(activeSeries), noSearch = !searchQuery;
+  if (noYear && noSerie && noSearch) return ITEMS;
+  var result = [], i;
+  for (i = 0; i < ITEMS.length; i++) {
+    var it = ITEMS[i];
+    var yearOk = noYear || sHas(activeYears, String(it.annee));
+    var serieOk = noSerie;
+    if (!serieOk) {
+      serieOk = true;
+      var itemTags = sFromArr((it.serie || '').split('|').map(function(t) { return t.trim(); }));
+      for (var ak in activeSeries)
+        if (sHas(activeSeries, ak) && !sHas(itemTags, ak)) { serieOk = false; break; }
+    }
+    var textOk = noSearch;
+    if (!textOk) {
+      var h = [it.ref, it.serie, it.ico, it.technique, it.support].join(' ').toLowerCase();
+      textOk = h.indexOf(searchQuery) !== -1;
+    }
+    if (yearOk && serieOk && textOk) result.push(it);
+  }
+  return result;
+}
+
+function renderGallery() {
+  var filtered = filterItems();
+  /* Tri : datés d'abord (par ref), SansDate en fin */
+  filtered.sort(function(a, b) {
+    var aSD = String(a.ref).indexOf('SansDate') === 0 ? 1 : 0;
+    var bSD = String(b.ref).indexOf('SansDate') === 0 ? 1 : 0;
+    if (aSD !== bSD) return aSD - bSD;
+    return String(a.ref) < String(b.ref) ? -1 : String(a.ref) > String(b.ref) ? 1 : 0;
+  });
+  var fc = document.getElementById('filter-count');
+  if (fc) fc.textContent = filtered.length + ' / ' + ITEMS.length + ' œuvres';
+  var grid = document.getElementById('grid'); grid.innerHTML = '';
+  for (var i = 0; i < filtered.length; i++) {
+    var it = filtered[i];
+    var tags = (it.serie || '').split('|');
+    var tagsHtml = '';
+    for (var j = 0; j < tags.length; j++) {
+      var t = tags[j].trim();
+      if (t) tagsHtml += '<span class="tag" onclick="addSerieFilter(\'' + esc(t) + '\')">' + esc(t) + '</span>';
+    }
+    var tech = [it.technique, it.support].filter(Boolean).join(' / ');
+    var imgSafe = (it.image_url || '').replace(/'/g, '&#39;');
+    var card = document.createElement('div'); card.className = 'card';
+    card.innerHTML =
+      '<div class="card-img"><img src="' + (it.image_url || '') + '" alt="' + esc(it.ref) + '"' +
+      ' onerror="this.style.display=\'none\'" onclick="openLB(\'' + imgSafe + '\')"></div>' +
+      '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
+      '<div class="card-ref">' + esc(it.ref) + '</div>' +
+      (tech ? '<div class="card-tech">' + esc(tech) + '</div>' : '') +
+      '</div>';
+    grid.appendChild(card);
+  }
+}
+
+function addSerieFilter(s) {
+  sAdd(activeSeries, s);
+  document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c) {
+    if (c.getAttribute('data-s') === s) c.className = 'chip active';
+  });
+  enforceMinFilter(); renderGallery();
+}
+
+/* ── Lightbox ── */
+function openLB(src) {
+  if (!src) return;
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb').className = 'open';
+  document.body.style.overflow = 'hidden';
+}
+function closeLB() {
+  document.getElementById('lb').className = '';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLB(); });
+document.getElementById('lb').addEventListener('click', function(e) {
+  if (e.target === document.getElementById('lb')) closeLB();
+});
+</script>
+</body>
+</html>

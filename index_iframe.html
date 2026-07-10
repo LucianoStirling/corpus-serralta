@@ -13,7 +13,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--ink)}
 
-/* ── NAV ONGLETS ── */
+/* ── NAV ── */
 #main-nav{display:flex;border-bottom:2px solid var(--rule);background:var(--white);
   position:sticky;top:0;z-index:20;height:var(--nav-h);align-items:center}
 .main-tab{padding:0 28px;height:100%;font-size:13px;cursor:pointer;color:var(--light);
@@ -35,7 +35,6 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
   flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .chip:hover{border-color:var(--mid)}
 .chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
-.chip-vsep{width:1px;background:rgba(0,0,0,.15);height:16px;flex-shrink:0;align-self:center;margin:0 4px}
 .filter-search-row{display:flex;align-items:center;gap:10px;padding:2px 0 4px}
 .filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
   padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
@@ -64,8 +63,6 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .coll-section{margin-bottom:48px}
 .coll-title{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:var(--light);margin-bottom:20px}
 .coll-divider{border:none;border-top:1px solid var(--rule);margin-bottom:32px}
-
-/* Grandes séries */
 .series-major-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--rule)}
 .smc{background:var(--white);padding:22px 20px;cursor:pointer;transition:background .12s}
 .smc:hover{background:var(--bg)}
@@ -74,8 +71,6 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .smc-n{font-size:38px;font-weight:300;color:var(--accent);line-height:1.1;
   margin-bottom:8px;font-variant-numeric:tabular-nums}
 .smc-desc{font-size:12px;color:var(--mid);line-height:1.65}
-
-/* Toutes séries + Périodes */
 .series-all-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
 .entry-card{background:var(--white);border:1px solid var(--rule);border-radius:3px;
   padding:20px;cursor:pointer;transition:all .15s;text-align:center}
@@ -104,6 +99,72 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 #loading small{font-size:10px;color:#bbb}
 .err-msg{color:#c00;font-size:13px;max-width:400px;text-align:center;line-height:1.6}
 
+/* ── ADMIN ── */
+.lock-btn{background:none;border:none;cursor:pointer;font-size:16px;
+  padding:0 16px 0 8px;opacity:.3;transition:opacity .15s;margin-left:auto}
+.lock-btn:hover,.lock-btn.unlocked{opacity:1}
+.lock-btn.unlocked{filter:sepia(1) saturate(3) hue-rotate(90deg)}
+.admin-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;
+  display:flex;align-items:center;justify-content:center}
+.admin-box{background:var(--white);border:1px solid var(--rule);border-radius:4px;
+  padding:28px 32px;width:280px;box-shadow:0 8px 32px rgba(0,0,0,.18)}
+.admin-title{font-size:14px;font-weight:400;margin-bottom:16px}
+.admin-input{width:100%;border:1px solid var(--rule);border-radius:3px;
+  padding:8px 12px;font-size:13px;font-family:inherit;outline:none}
+.admin-input:focus{border-color:var(--ink)}
+.admin-err{font-size:12px;color:#c00;min-height:18px;margin-top:6px}
+.admin-btns{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.admin-cancel,.admin-ok{border:1px solid var(--rule);background:none;
+  padding:6px 16px;font-size:12px;border-radius:2px;cursor:pointer;font-family:inherit}
+.admin-ok{background:var(--ink);color:var(--white);border-color:var(--ink)}
+
+/* ── TAG EDITOR ── */
+#tag-panel{display:none;position:fixed;inset:0;z-index:300}
+#tag-panel.open{display:flex}
+#tag-overlay{flex:1;background:rgba(0,0,0,.35);cursor:pointer}
+#tag-drawer{width:300px;background:var(--white);display:flex;flex-direction:column;
+  border-left:1px solid var(--rule);overflow:hidden;height:100%}
+#tag-drawer-header{padding:14px 16px;border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:center;gap:8px;flex-shrink:0}
+#tag-drawer-ref{font-size:13px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tag-close-btn{background:none;border:none;cursor:pointer;font-size:18px;
+  color:var(--mid);padding:0;flex-shrink:0;line-height:1}
+#tag-drawer-img{height:110px;overflow:hidden;background:#f0f0ee;flex-shrink:0;cursor:zoom-in}
+#tag-drawer-img img{width:100%;height:100%;object-fit:contain}
+#tag-drawer-info{padding:6px 16px;font-size:11px;color:var(--light);
+  border-bottom:1px solid var(--rule);display:flex;justify-content:space-between;
+  align-items:center;flex-shrink:0}
+#tag-count{font-weight:600;color:var(--ink)}
+#tag-list{flex:1;overflow-y:auto;padding:4px 0}
+.tag-check-row{display:flex;align-items:center;gap:10px;padding:7px 16px;
+  cursor:pointer;font-size:12px;color:var(--ink);transition:background .1s;user-select:none}
+.tag-check-row:hover{background:var(--bg)}
+.tag-check-row.checked{color:#2a7a3b;font-weight:500}
+.tag-check-row input{accent-color:#2a7a3b;flex-shrink:0;width:14px;height:14px;cursor:pointer}
+.tag-pinned{background:#fafaf8}
+.tag-separator{height:1px;background:var(--rule);margin:4px 0}
+.tag-required-err{font-size:11px;color:#c00;padding:4px 16px;display:none}
+#tag-drawer-footer{padding:12px 16px;border-top:1px solid var(--rule);
+  display:flex;gap:8px;justify-content:flex-end;flex-shrink:0}
+#tag-save-btn{background:var(--ink);color:var(--white);border:none;
+  padding:7px 20px;border-radius:3px;cursor:pointer;font-size:13px}
+#tag-save-btn:disabled{opacity:.5;cursor:default}
+.tag-cancel-btn{background:none;border:1px solid var(--rule);color:var(--mid);
+  padding:7px 16px;border-radius:3px;cursor:pointer;font-size:13px}
+.card-tag-edit{display:none;position:absolute;top:36px;right:8px;width:26px;height:26px;
+  border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--rule);
+  cursor:pointer;align-items:center;justify-content:center;font-size:13px;z-index:2;line-height:1}
+body.admin-on .card-tag-edit{display:flex}
+.card-tag-edit:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+#tag-new-row{display:flex;gap:6px;padding:8px 16px;border-top:1px solid var(--rule);flex-shrink:0}
+#tag-new-input{flex:1;border:1px solid var(--rule);border-radius:3px;
+  padding:5px 8px;font-size:12px;font-family:inherit;outline:none}
+#tag-new-input:focus{border-color:var(--ink)}
+#tag-new-btn{background:var(--ink);color:var(--white);border:none;border-radius:3px;
+  padding:5px 10px;cursor:pointer;font-size:13px;flex-shrink:0}
+#tag-new-err{font-size:11px;color:#c00;padding:0 16px;display:none}
+#tag-save-status{font-size:10px;color:#2a7a3b}
+
 /* ── RESPONSIVE ── */
 @media(max-width:800px){
   .filters{padding:6px 16px}
@@ -123,66 +184,335 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 
 <div id="loading">
   <div class="spinner"></div>
-  <p id="load-msg">Chargement du corpus&#8230;</p>
+  <p id="load-msg"></p>
   <small id="load-sub"></small>
 </div>
 
 <nav id="main-nav" style="display:none">
-  <button class="main-tab active" onclick="switchMainTab('galerie')">Galerie</button>
-  <button class="main-tab" onclick="switchMainTab('collections')">Collections</button>
+  <button class="main-tab active" id="tab-galerie" onclick="switchMainTab('galerie')"></button>
+  <button class="main-tab" id="tab-collections" onclick="switchMainTab('collections')"></button>
+  <button class="lock-btn" id="lock-btn" onclick="toggleAdmin()" title="Administration">&#128274;</button>
 </nav>
 
-<!-- ONGLET GALERIE -->
 <div id="galerie-tab">
   <div class="filters">
     <div class="filter-row">
-      <span class="filter-label">Ann&#233;es</span>
+      <span class="filter-label" id="lbl-annees"></span>
       <div class="filter-chips-scroll" id="year-chips"></div>
     </div>
     <div class="filter-row">
-      <span class="filter-label" style="font-size:9px">Style</span>
+      <span class="filter-label" style="font-size:9px" id="lbl-style"></span>
       <div class="filter-chips-scroll" id="serie-chips-class"></div>
     </div>
     <div class="filter-row">
-      <span class="filter-label">S&#233;ries</span>
+      <span class="filter-label" id="lbl-series"></span>
       <div class="filter-chips-scroll" id="serie-chips-theme"></div>
     </div>
     <div class="filter-search-row">
-      <input type="search" class="filter-search" id="search-input"
-        placeholder="Rechercher&#8230;" oninput="onSearch(this.value)">
+      <input type="search" class="filter-search" id="search-input" oninput="onSearch(this.value)">
       <span id="filter-count"></span>
-      <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn">Effacer</span>
+      <span class="clear-btn" onclick="clearFilters()" style="display:none" id="clear-btn"></span>
     </div>
   </div>
   <div class="grid" id="grid"></div>
 </div>
 
-<!-- ONGLET COLLECTIONS -->
 <div id="collections-tab" style="display:none">
   <div class="coll-view" id="coll-view"></div>
 </div>
 
-<!-- LIGHTBOX -->
 <div id="lb">
   <img id="lb-img" src="" alt="">
   <button id="lb-close" onclick="closeLB()">&#x2715;</button>
 </div>
 
+<div id="tag-panel">
+  <div id="tag-overlay" onclick="closeTagEditor()"></div>
+  <div id="tag-drawer">
+    <div id="tag-drawer-header">
+      <span id="tag-drawer-ref"></span>
+      <button class="tag-close-btn" onclick="closeTagEditor()">&#x2715;</button>
+    </div>
+    <div id="tag-drawer-img" onclick="openLBFromTag()">
+      <img id="tag-drawer-img-el" src="" alt="">
+    </div>
+    <div id="tag-drawer-info">
+      <span id="tag-count">0 / 5 tags</span>
+      <span id="tag-save-status"></span>
+    </div>
+    <div id="tag-list"></div>
+    <div id="tag-required-err" class="tag-required-err">⚠ Au moins un tag technique obligatoire (Couleur, Noir et Blanc, Diapo-Photo, Martelés, Sculptures, Supports Divers)</div>
+    <div id="tag-new-err"></div>
+    <div id="tag-new-row">
+      <input id="tag-new-input" type="text" placeholder="Nouveau tag&#8230;"
+        onkeydown="if(event.key==='Enter')addNewTag()">
+      <button id="tag-new-btn" onclick="addNewTag()">+</button>
+    </div>
+    <div id="tag-drawer-footer">
+      <button class="tag-cancel-btn" onclick="closeTagEditor()">Annuler</button>
+      <button id="tag-save-btn" onclick="saveTagEditor()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<div id="admin-modal" class="admin-overlay" style="display:none">
+  <div class="admin-box">
+    <div class="admin-title">Qui es-tu ?</div>
+    <input type="text" id="admin-pwd" class="admin-input" placeholder="Ton prénom"
+      autocomplete="off" onkeydown="if(event.key==='Enter')checkAdmin()">
+    <div id="admin-err" class="admin-err"></div>
+    <div class="admin-btns">
+      <button class="admin-cancel" onclick="closeAdminModal()">Annuler</button>
+      <button class="admin-ok" onclick="checkAdmin()">Valider</button>
+    </div>
+  </div>
+</div>
+
 <script>
 /* ================================================================
-   CORPUS SERRALTA — iframe embed (unitorserralta)
-   2 onglets : Galerie | Collections
+   CORPUS SERRALTA — iframe embed · fr / es / en
+   Usage : ?lang=es  ou  ?lang=en  (défaut : fr)
    ================================================================ */
+
+/* ── Détection langue ── */
+var lang = (new URLSearchParams(window.location.search).get('lang') || 'fr');
+
+/* ── Dictionnaire i18n ── */
+var LANG = {
+
+  /* ────────── FRANÇAIS ────────── */
+  fr: {
+    tab_galerie:    'Galerie',
+    tab_collections:'Collections',
+    lbl_annees:     'Années',
+    lbl_style:      'Style',
+    lbl_series:     'Séries',
+    search_ph:      'Rechercher…',
+    btn_clear:      'Effacer',
+    works:          'œuvres',
+    sec_grandes:    'Les grandes séries',
+    sec_toutes:     'Toutes les séries',
+    sec_periodes:   'Périodes',
+    loading:        'Chargement du corpus…',
+    connecting:     'Connexion au catalogue…',
+    loading_n:      'Chargement de {n} œuvres…',
+    error:          'Impossible de charger le catalogue.',
+    /* Tags : clé FR = valeur affichée → pas de dict nécessaire, fallback sur la clé */
+    tags: {},
+    descs: {
+      'Animaux':               'Chevaux, taureaux, oiseaux, chiens… Souvent en tension ou fusion avec le nu humain.',
+      'Visages':               'Les visages où les détails sont travaillés avec précision, en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.',
+      'SCIENS-ART':            'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes, une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.',
+      'Musique':               'Pianistes, violoncellistes, bandónistes, violonistes. Les musiciens fusionnent avec leurs instruments jusqu’à la dissolution formelle. Lien profond avec la culture rioplatense.',
+      'Paquebot':              'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement, motif autobiographique discret.',
+      'Portraits':             'Visages très travaillés représentant proches ou personnes connues, regards frontaux d’une intensité inhabituelle.',
+      'Manuscrit':             'Œuvres intégrant texte manuscrit : poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.',
+      'Supports Divers':       'Tout ce qui n’est pas le papier Canson habituel : carton, polystyrène, enveloppes, matériaux récupérés. Le support n’est jamais anodin, il altère le tracé, contraint le geste, transforme la surface en co-auteur de l’image.',
+      'Martelés':         'Technique propre à Serralta : la reproduction photographique d’un dessin est collée sur une plaque de mousse expansive, puis martelée à la main pour créer un relief en creux. De l’encre est souvent ajoutée dans les zones martelées, révélant l’empreinte du geste. À mi-chemin entre dessin, estampe et sculpture.',
+      'Diapo-Photo':           'Œuvres incluant des photos, ainsi que le travail sur diapositives.',
+      'Diapogravure':          'Technique unique : travail direct sur diapositives 35 mm.',
+      'Personnages Filiformes':'Serralta efface la masse des corps et réduit la figure à un tracé minimal, linéaire. Ce dépouillement détonne par rapport au caractère plantureux et charnel de la majorité de son œuvre.',
+      'Politique':             'Les militaires, les drapeaux, les armes, les scènes de torture. Trace de l’exil et de la dictature uruguayenne, une présence rare mais explicite dans un corpus plutôt cosmologique.',
+      'Habillés':         'Contrepoint aux nus omniprésents : chez Serralta, la nudité est l’état naturel. Un personnage habillé devient souvent porteur d’une symbolique (militaires, figures d’autorité…).',
+      'Urbanisme':             'Paysages reconnaissables, croquis architecturaux, vues urbaines. Les rares moments où Serralta ancre la composition dans un espace géographique identifiable.',
+      'Mise en abyme':         'La main, le doigt ou le stylo de l’artiste apparaît dans le dessin en train de dessiner. Geste réflexif classique, rare chez Serralta mais toujours délibéré.',
+      'Sport':                 'Football, champs de courses, compétitions. Hommage à la culture populaire rioplatense, thème festif.',
+      'Nus':                   'Motif le plus constant, présent dès 1976 et jamais abandonné. Corps multiple, frontal, intégré à la nature ou confronté à l’animal. Le nu est pour Serralta une syntaxe autant qu’un sujet.',
+      'Études':           'Recherches formelles préparatoires ou autonomes : esquisses de figures, études de mains et de visages. Le laboratoire visible de la pratique de Serralta.',
+      'Dédicaces':        'Œuvres offertes et dédicacées. Révèlent le réseau amical et intellectuel de Serralta : musiciens, architectes, poètes, famille.',
+      'Illustrations Higinio Mena':'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena. Seule collaboration éditoriale documentée de Serralta.',
+      'Série peintures':  'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.',
+      'Sculptures':            'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.',
+      'Croquis de voyage':     'Voyage d’études en Europe d’un jeune architecte uruguayen de 28 ans. Entre 1947 et 1960, Serralta (né en 1919) parcourt la France, l’Italie et l’Espagne, carnet en main : cathédrales gothiques, places italiennes, ponts parisiens, relevés cotés. Ces 209 dessins à l’encre ou au crayon, antérieurs à tout le reste du corpus, sont le seul témoignage visuel de sa formation européenne — avant l’exil, avant la dictature, avant SCIENS-ART.'
+    }
+  },
+
+  /* ────────── ESPAÑOL ────────── */
+  es: {
+    tab_galerie:    'Galería',
+    tab_collections:'Colecciones',
+    lbl_annees:     'Años',
+    lbl_style:      'Estilo',
+    lbl_series:     'Series',
+    search_ph:      'Buscar…',
+    btn_clear:      'Limpiar',
+    works:          'obras',
+    sec_grandes:    'Las grandes series',
+    sec_toutes:     'Todas las series',
+    sec_periodes:   'Períodos',
+    loading:        'Cargando el corpus…',
+    connecting:     'Conectando al catálogo…',
+    loading_n:      'Cargando {n} obras…',
+    error:          'Imposible cargar el catálogo.',
+    tags: {
+      'Animaux':               'Animales',
+      'Visages':               'Rostros',
+      'Musique':               'Música',
+      'Paquebot':              'Transatlántico',
+      'Portraits':             'Retratos',
+      'Manuscrit':             'Manuscrito',
+      'Supports Divers':       'Soportes Diversos',
+      'Martelés':         'Repujados',
+      'Diapo-Photo':           'Diapo-Foto',
+      'Diapogravure':          'Diapograbado',
+      'Personnages Filiformes':'Figuras Filiformes',
+      'Politique':             'Política',
+      'Habillés':         'Vestidos',
+      'Urbanisme':             'Urbanismo',
+      'Sport':                 'Deporte',
+      'Nus':                   'Desnudos',
+      'Études':           'Estudios',
+      'Dédicaces':        'Dedicatorias',
+      'Illustrations Higinio Mena':'Ilustraciones Higinio Mena',
+      'Série peintures':  'Serie pinturas',
+      'Sculptures':            'Esculturas',
+      'Croquis de voyage':     'Bocetos de viaje',
+      'Couleur':               'Color',
+      'Noir et Blanc':         'Blanco y Negro',
+      'Diapo-Photo':           'Diapo-Foto',
+      'Martelés':         'Repujados',
+      'Sculptures':            'Esculturas',
+      'Supports Divers':       'Soportes Diversos',
+      'France':                'Francia',
+      'Italie':                'Italia',
+      'Espagne':               'España'
+    },
+    descs: {
+      'Animaux':               'Caballos, toros, pájaros, perros… A menudo en tensión o fusión con el desnudo humano.',
+      'Visages':               'Rostros cuyos detalles están trabajados con precisión, en oposición a los pequeños círculos que anonimizan las figuras en las composiciones densas.',
+      'SCIENS-ART':            'Expresión pictórica del sistema cosmológico de Serralta. Círculos, cuadrículas, diagramas, una cartografía de fuerzas invisibles surgida de su libro fundacional, concebida como lenguaje universal.',
+      'Musique':               'Pianistas, violonchelistas, bandoneonistas, violinistas. Los músicos se funden con sus instrumentos hasta la disolución formal. Vínculo profundo con la cultura rioplatense.',
+      'Paquebot':              'Barcos dibujados con una precisión casi técnica, inscritos en paisajes ya habitados. Figura del exilio y del desplazamiento, motivo autobiográfico discreto.',
+      'Portraits':             'Rostros muy elaborados que representan a allegados o personas conocidas, miradas frontales de una intensidad inusual.',
+      'Manuscrit':             'Obras que integran texto manuscrito: poemas, fragmentos teóricos, dedicatorias desarrolladas. La escritura como elemento plástico de pleno derecho.',
+      'Supports Divers':       'Todo lo que no es el papel Canson habitual: cartón, poliestireno, sobres, materiales recuperados. El soporte nunca es anodino: altera el trazo, constriñe el gesto, transforma la superficie en coautor de la imagen.',
+      'Martelés':         'Técnica propia de Serralta: la reproducción fotográfica de un dibujo se pega sobre una placa de espuma expandida y luego se martillea a mano para crear un relieve en hueco. A menudo se añade tinta en las zonas martilladas, revelando la huella del gesto. A medio camino entre dibujo, estampa y escultura.',
+      'Diapo-Photo':           'Obras que incluyen fotografías, así como el trabajo sobre diapositivas.',
+      'Diapogravure':          'Técnica única: trabajo directo sobre diapositivas de 35 mm.',
+      'Personnages Filiformes':'Serralta borra la masa de los cuerpos y reduce la figura a un trazado mínimo, lineal. Este despojamiento contrasta con el carácter exuberante y carnal de la mayor parte de su obra.',
+      'Politique':             'Los militares, las banderas, las armas, las escenas de tortura. Huella del exilio y de la dictadura uruguaya, una presencia rara pero explícita en un corpus más bien cosmológico.',
+      'Habillés':         'Contrapunto a los desnudos omnipresentes: en Serralta, la desnudez es el estado natural. Un personaje vestido se convierte a menudo en portador de una simbología (militares, figuras de autoridad…).',
+      'Urbanisme':             'Paisajes reconocibles, bocetos arquitectónicos, vistas urbanas. Los escasos momentos en que Serralta ancla la composición en un espacio geográfico identificable.',
+      'Mise en abyme':         'La mano, el dedo o el bolígrafo del artista aparece en el dibujo mientras dibuja. Gesto reflexivo clásico, raro en Serralta pero siempre deliberado.',
+      'Sport':                 'Fútbol, hipódromos, competiciones. Homenaje a la cultura popular rioplatense, tema festivo.',
+      'Nus':                   'El motivo más constante, presente desde 1976 y nunca abandonado. Cuerpo múltiple, frontal, integrado en la naturaleza o confrontado al animal. El desnudo es para Serralta una sintaxis tanto como un tema.',
+      'Études':           'Investigaciones formales preparatorias o autónomas: esbozos de figuras, estudios de manos y rostros. El laboratorio visible de la práctica de Serralta.',
+      'Dédicaces':        'Obras ofrecidas y dedicadas. Revelan la red amistosa e intelectual de Serralta: músicos, arquitectos, poetas, familia.',
+      'Illustrations Higinio Mena':'Ilustraciones realizadas para los libros del poeta uruguayo Higinio Mena. Única colaboración editorial documentada de Serralta.',
+      'Série peintures':  'Obras sobre lienzo o tabla, óleo o acrílico. Minoritarias en el corpus pero testimonio de una ambición de gran formato ausente del dibujo.',
+      'Sculptures':            'Producción tridimensional marginal pero documentada. Materiales heterogéneos, formas surgidas del vocabulario figurativo habitual.',
+      'Croquis de voyage':     'Viaje de estudios por Europa de un joven arquitecto uruguayo de 28 años. Entre 1947 y 1960, Serralta (nacido en 1919) recorre Francia, Italia y España, cuaderno en mano: catedrales góticas, plazas italianas, puentes parisinos, planos acotados. Estos 209 dibujos a tinta o lápiz, anteriores al resto del corpus, son el único testimonio visual de su formación europea — antes del exilio, antes de la dictadura, antes del SCIENS-ART.'
+    }
+  },
+
+  /* ────────── ENGLISH ────────── */
+  en: {
+    tab_galerie:    'Gallery',
+    tab_collections:'Collections',
+    lbl_annees:     'Years',
+    lbl_style:      'Style',
+    lbl_series:     'Series',
+    search_ph:      'Search…',
+    btn_clear:      'Clear',
+    works:          'works',
+    sec_grandes:    'Major series',
+    sec_toutes:     'All series',
+    sec_periodes:   'Periods',
+    loading:        'Loading corpus…',
+    connecting:     'Connecting…',
+    loading_n:      'Loading {n} works…',
+    error:          'Unable to load catalogue.',
+    tags: {
+      'Animaux':               'Animals',
+      'Visages':               'Faces',
+      'Musique':               'Music',
+      'Paquebot':              'Ocean Liner',
+      'Portraits':             'Portraits',
+      'Manuscrit':             'Manuscript',
+      'Supports Divers':       'Varied Supports',
+      'Martelés':         'Hammered',
+      'Diapo-Photo':           'Diapo-Photo',
+      'Diapogravure':          'Diapogravure',
+      'Personnages Filiformes':'Filiform Figures',
+      'Politique':             'Politics',
+      'Habillés':         'Clothed',
+      'Urbanisme':             'Urbanism',
+      'Sport':                 'Sport',
+      'Nus':                   'Nudes',
+      'Études':           'Studies',
+      'Dédicaces':        'Dedications',
+      'Illustrations Higinio Mena':'Higinio Mena Illustrations',
+      'Série peintures':  'Paintings series',
+      'Sculptures':            'Sculptures',
+      'Croquis de voyage':     'Travel Sketches',
+      'Couleur':               'Colour',
+      'Noir et Blanc':         'Black and White',
+      'France':                'France',
+      'Italie':                'Italy',
+      'Espagne':               'Spain'
+    },
+    descs: {
+      'Animaux':               'Horses, bulls, birds, dogs… Often in tension or fusion with the human nude.',
+      'Visages':               'Faces in which details are rendered with precision, as opposed to the small circles that anonymise figures in dense compositions.',
+      'SCIENS-ART':            'Pictorial expression of Serralta’s cosmological system. Circles, grids, diagrams — a mapping of invisible forces drawn from his founding book, conceived as a universal language.',
+      'Musique':               'Pianists, cellists, bandoneon players, violinists. Musicians merge with their instruments to the point of formal dissolution. A deep bond with Rioplatense culture.',
+      'Paquebot':              'Ships drawn with near-technical precision, set within already populated landscapes. A figure of exile and displacement, a discreet autobiographical motif.',
+      'Portraits':             'Highly worked faces representing close relations or known figures, frontal gazes of unusual intensity.',
+      'Manuscrit':             'Works incorporating handwritten text: poems, theoretical fragments, extended dedications. Writing as a fully plastic element.',
+      'Supports Divers':       'Everything other than the usual Canson paper: cardboard, polystyrene, envelopes, salvaged materials. The support is never incidental — it alters the line, constrains the gesture, turns the surface into co-author of the image.',
+      'Martelés':         'A technique unique to Serralta: a photographic reproduction of a drawing is glued onto expanded foam, then hammered by hand to create a sunken relief. Ink is often added to the hammered areas, revealing the imprint of the gesture. Halfway between drawing, printmaking and sculpture.',
+      'Diapo-Photo':           'Works incorporating photographs, as well as work on slides.',
+      'Diapogravure':          'A unique technique: working directly on 35 mm slides.',
+      'Personnages Filiformes':'Serralta erases the mass of bodies and reduces the figure to a minimal, linear trace. This stripping-down stands in sharp contrast to the abundant, carnal character of most of his work.',
+      'Politique':             'Soldiers, flags, weapons, scenes of torture. A trace of exile and the Uruguayan dictatorship — rare but explicit in an otherwise cosmological corpus.',
+      'Habillés':         'A counterpoint to the ever-present nudes: in Serralta’s work, nudity is the natural state. A clothed figure often becomes a bearer of symbolism — soldiers, authority figures…',
+      'Urbanisme':             'Recognisable landscapes, architectural sketches, urban views. The rare moments when Serralta anchors a composition in an identifiable geographical space.',
+      'Mise en abyme':         'The artist’s hand, finger or pen appears within the drawing in the act of drawing. A classic reflexive gesture, rare in Serralta but always deliberate.',
+      'Sport':                 'Football, racecourses, competitions. A tribute to Rioplatense popular culture — a festive theme.',
+      'Nus':                   'The most constant motif, present from 1976 and never abandoned. Multiple, frontal bodies, integrated into nature or confronted with the animal. The nude is for Serralta a syntax as much as a subject.',
+      'Études':           'Preparatory or autonomous formal research: figure sketches, studies of hands and faces. The visible laboratory of Serralta’s practice.',
+      'Dédicaces':        'Works given and dedicated. They reveal Serralta’s friendship and intellectual network: musicians, architects, poets, family.',
+      'Illustrations Higinio Mena':'Illustrations made for the books of Uruguayan poet Higinio Mena. The only documented editorial collaboration of Serralta’s.',
+      'Série peintures':  'Works on canvas or board, oil or acrylic. A minority within the corpus but evidence of a large-format ambition absent from the drawings.',
+      'Sculptures':            'A marginal but documented three-dimensional output. Heterogeneous materials, forms drawn from the usual figurative vocabulary.',
+      'Croquis de voyage':     'A study trip across Europe by a 28-year-old Uruguayan architect. Between 1947 and 1960, Serralta (born 1919) travels through France, Italy and Spain, sketchbook in hand: Gothic cathedrals, Italian squares, Parisian bridges, annotated plans. These 209 ink or pencil drawings, predating the rest of the corpus, are the only visual record of his European training — before the exile, before the dictatorship, before SCIENS-ART.'
+    }
+  }
+};
+
+if (!LANG[lang]) lang = 'fr';
+
+/* ── Helpers i18n ── */
+function T(k)      { return (LANG[lang][k] !== undefined ? LANG[lang][k] : (LANG.fr[k] || k)); }
+function Tn(k,n)   { return T(k).replace('{n}', n); }
+function tagLabel(k){ return ((LANG[lang].tags||{})[k] || k); }
+function sDesc(k)  { return ((LANG[lang].descs||{})[k] || (LANG.fr.descs||{})[k] || ''); }
+
+/* ── Traductions technique / support ── */
+var TECH_LABEL = {
+  es:{'Acrylique':'Acrílico','Aquarelle':'Acuarela','Aquarelle et Encre de Chine':'Acuarela y tinta china','Aquarelle et crayon':'Acuarela y lápiz','Assemblage mixte':'Ensamblaje mixto','Assemblage mixte 2D/3D':'Ensamblaje mixto 2D/3D','Assemblage-installation':'Ensamblaje-instalación','Aérosol et encre':'Aerosol y tinta','Collage':'Collage','Collage et Feutre':'Collage y rotulador','Collage et annotations manuscrites':'Collage y anotaciones manuscritas','Collage et dessin':'Collage y dibujo','Collage et peinture':'Collage y pintura','Collage photographique':'Collage fotográfico','Crayon':'Lápiz','Crayon bleu et Encre de Chine':'Lápiz azul y tinta china','Crayon de couleur':'Lápiz de color','Crayon et Feutre':'Lápiz y rotulador','Crayon et crayons de couleur':'Lápiz y lápices de color','Crayon et encre':'Lápiz y tinta','Crayon graphite':'Lápiz grafito','Dessin et photo':'Dibujo y foto','Diapogravure':'Diapograbado','Divers et Collage':'Varios y collage','Découpage papier collé':'Recorte y papel pegado','Encre':'Tinta','Encre Crayon':'Tinta y lápiz','Encre Feutre':'Tinta y rotulador','Encre bleue':'Tinta azul','Encre de Chine':'Tinta china','Encre de Chine crayon feutre':'Tinta china, lápiz y rotulador','Encre de Chine et Aquarelle':'Tinta china y acuarela','Encre de Chine et Collage':'Tinta china y collage','Encre de Chine et Crayon':'Tinta china y lápiz','Encre de Chine et Crayon couleur':'Tinta china y lápiz de color','Encre de Chine et Crayon de couleur':'Tinta china y lápiz de color','Encre de Chine et Découpage':'Tinta china y recorte','Encre de Chine et Feutre':'Tinta china y rotulador','Encre de Chine et Feutre couleur':'Tinta china y rotulador de color','Encre de Chine et Feutre et Crayon':'Tinta china, rotulador y lápiz','Encre de Chine et Lavis':'Tinta china y aguada','Encre de Chine et Lavis couleur':'Tinta china y aguada en color','Encre de Chine et Lavis et Feutre':'Tinta china, aguada y rotulador','Encre de Chine et Pastel':'Tinta china y pastel','Encre de Chine et Point de couleur':'Tinta china y puntos de color','Encre de Chine et couleur':'Tinta china y color','Encre de Chine et crayon':'Tinta china y lápiz','Encre de Chine et encre':'Tinta china y tinta','Encre de Chine et feutre':'Tinta china y rotulador','Encre de Chine et lavis':'Tinta china y aguada','Encre de Chine et lavis couleur':'Tinta china y aguada en color','Encre de Chine stylo':'Tinta china y bolígrafo','Encre de Chine, Crayon':'Tinta china, lápiz','Encre de Chine, Feutre':'Tinta china, rotulador','Encre de Chine, Feutre couleur':'Tinta china, rotulador de color','Encre de Chine, couleur':'Tinta china, color','Encre de Chine, lavis couleur':'Tinta china, aguada en color','Encre de Chine, lavis et gouache':'Tinta china, aguada y gouache','Encre de Chine, lavis/feutres couleur':'Tinta china, aguada/rotuladores de color','Encre de Chine, marqueurs couleur':'Tinta china, marcadores de color','Encre de chine':'Tinta china','Encre de chine Crayon':'Tinta china y lápiz','Encre de chine Feutre':'Tinta china y rotulador','Encre et Crayon':'Tinta y lápiz','Encre et Crayon couleur':'Tinta y lápiz de color','Encre et Feutre':'Tinta y rotulador','Encre et Pastel':'Tinta y pastel','Encre et aquarelle':'Tinta y acuarela','Encre et collage':'Tinta y collage','Encre et crayon':'Tinta y lápiz','Encre et feutre':'Tinta y rotulador','Encre et lavis':'Tinta y aguada','Encre et marker':'Tinta y marcador','Encre et marker couleur':'Tinta y marcador de color','Encre et pastel':'Tinta y pastel','Encre sur papier':'Tinta sobre papel','Encre tricolore':'Tinta tricolor','Encres couleur et crayon':'Tintas de color y lápiz','Encres couleur et feutre':'Tintas de color y rotulador','Feutre':'Rotulador','Feutre Crayon':'Rotulador y lápiz','Feutre Crayon Stylo':'Rotulador, lápiz y bolígrafo','Feutre Fusain':'Rotulador y carboncillo','Feutre couleur':'Rotulador de color','Feutre couleur et Encre de Chine':'Rotulador de color y tinta china','Feutre couleur, Crayon':'Rotulador de color, lápiz','Feutre crayon':'Rotulador y lápiz','Feutre encre de Chine':'Rotulador y tinta china','Feutre et Bic':'Rotulador y bolígrafo','Feutre et Crayon couleur':'Rotulador y lápiz de color','Feutre et Crayon et Fusain':'Rotulador, lápiz y carboncillo','Feutre et Encre de Chine':'Rotulador y tinta china','Feutre et Encre de Chine et Crayon':'Rotulador, tinta china y lápiz','Feutre et crayon':'Rotulador y lápiz','Feutre et crayon de couleur':'Rotulador y lápiz de color','Feutre et stylo':'Rotulador y bolígrafo','Feutre noir':'Rotulador negro','Feutre noir et Feutre couleur':'Rotulador negro y rotulador de color','Feutre, Crayon':'Rotulador, lápiz','Feutre, Pastel':'Rotulador, pastel','Fusain':'Carboncillo','Fusain Feutre':'Carboncillo y rotulador','Gouache':'Gouache','Gouache et Encre de Chine':'Gouache y tinta china','Gouache et Feutre':'Gouache y rotulador','Huile':'Óleo','Indéterminée':'Indeterminada','Lithographie':'Litografía','Marker et aquarelle':'Marcador y acuarela','Pastel':'Pastel','Pastel et Encre de Chine':'Pastel y tinta china','Pastel gras':'Pastel graso','Peinture (gouache ou acrylique)':'Pintura (gouache o acrílico)','Peinture sur tirage photographique':'Pintura sobre copia fotográfica',"Peinture à l'huile":'Pintura al óleo','Photo martelée':'Foto martelada','Photo martelée et Collage':'Foto martelada y collage','Photo martelée et encre':'Foto martelada y tinta','Sculpture':'Escultura','Sculpture assemblage':'Escultura ensamblaje','Sculpture constructiviste':'Escultura constructivista','Sculpture fil':'Escultura de alambre','Stylo':'Bolígrafo','Stylo bille bleu':'Bolígrafo azul','Stylo crayon feutre':'Bolígrafo, lápiz y rotulador','Stylo et marker':'Bolígrafo y marcador','Stylo-bille bleu':'Bolígrafo azul','Tableau-assemblage':'Cuadro ensamblaje','Technique mixte (collage)':'Técnica mixta (collage)','Technique mixte (photo + dessin)':'Técnica mixta (foto + dibujo)','decoupage et Feutre':'Recorte y rotulador','encre de chine':'Tinta china','encre de chine + lavis':'Tinta china y aguada','encre de chine + lavis couleur':'Tinta china y aguada en color','encre de chine + peinture':'Tinta china y pintura','encre sépia ou feutre brun':'Tinta sepia o rotulador marrón','pastel ou crayon de couleur':'Pastel o lápiz de color','peinture':'Pintura','peinture au pinceau':'Pintura al pincel','xxx':'Indeterminada'},
+  en:{'Acrylique':'Acrylic','Aquarelle':'Watercolour','Aquarelle et Encre de Chine':'Watercolour and Indian ink','Aquarelle et crayon':'Watercolour and pencil','Assemblage mixte':'Mixed assemblage','Assemblage mixte 2D/3D':'Mixed assemblage 2D/3D','Assemblage-installation':'Assemblage-installation','Aérosol et encre':'Spray and ink','Collage':'Collage','Collage et Feutre':'Collage and felt-tip pen','Collage et annotations manuscrites':'Collage and handwritten annotations','Collage et dessin':'Collage and drawing','Collage et peinture':'Collage and painting','Collage photographique':'Photographic collage','Crayon':'Pencil','Crayon bleu et Encre de Chine':'Blue pencil and Indian ink','Crayon de couleur':'Coloured pencil','Crayon et Feutre':'Pencil and felt-tip pen','Crayon et crayons de couleur':'Pencil and coloured pencils','Crayon et encre':'Pencil and ink','Crayon graphite':'Graphite pencil','Dessin et photo':'Drawing and photo','Diapogravure':'Diapogravure','Divers et Collage':'Various and collage','Découpage papier collé':'Cut and paste','Encre':'Ink','Encre Crayon':'Ink and pencil','Encre Feutre':'Ink and felt-tip pen','Encre bleue':'Blue ink','Encre de Chine':'Indian ink','Encre de Chine crayon feutre':'Indian ink, pencil and felt-tip pen','Encre de Chine et Aquarelle':'Indian ink and watercolour','Encre de Chine et Collage':'Indian ink and collage','Encre de Chine et Crayon':'Indian ink and pencil','Encre de Chine et Crayon couleur':'Indian ink and coloured pencil','Encre de Chine et Crayon de couleur':'Indian ink and coloured pencil','Encre de Chine et Découpage':'Indian ink and cutout','Encre de Chine et Feutre':'Indian ink and felt-tip pen','Encre de Chine et Feutre couleur':'Indian ink and coloured felt-tip pen','Encre de Chine et Feutre et Crayon':'Indian ink, felt-tip pen and pencil','Encre de Chine et Lavis':'Indian ink and wash','Encre de Chine et Lavis couleur':'Indian ink and colour wash','Encre de Chine et Lavis et Feutre':'Indian ink, wash and felt-tip pen','Encre de Chine et Pastel':'Indian ink and pastel','Encre de Chine et Point de couleur':'Indian ink and colour dots','Encre de Chine et couleur':'Indian ink and colour','Encre de Chine et crayon':'Indian ink and pencil','Encre de Chine et encre':'Indian ink and ink','Encre de Chine et feutre':'Indian ink and felt-tip pen','Encre de Chine et lavis':'Indian ink and wash','Encre de Chine et lavis couleur':'Indian ink and colour wash','Encre de Chine stylo':'Indian ink and pen','Encre de Chine, Crayon':'Indian ink, pencil','Encre de Chine, Feutre':'Indian ink, felt-tip pen','Encre de Chine, Feutre couleur':'Indian ink, coloured felt-tip pen','Encre de Chine, couleur':'Indian ink, colour','Encre de Chine, lavis couleur':'Indian ink, colour wash','Encre de Chine, lavis et gouache':'Indian ink, wash and gouache','Encre de Chine, lavis/feutres couleur':'Indian ink, wash/coloured felt-tips','Encre de Chine, marqueurs couleur':'Indian ink, colour markers','Encre de chine':'Indian ink','Encre de chine Crayon':'Indian ink and pencil','Encre de chine Feutre':'Indian ink and felt-tip pen','Encre et Crayon':'Ink and pencil','Encre et Crayon couleur':'Ink and coloured pencil','Encre et Feutre':'Ink and felt-tip pen','Encre et Pastel':'Ink and pastel','Encre et aquarelle':'Ink and watercolour','Encre et collage':'Ink and collage','Encre et crayon':'Ink and pencil','Encre et feutre':'Ink and felt-tip pen','Encre et lavis':'Ink and wash','Encre et marker':'Ink and marker','Encre et marker couleur':'Ink and colour marker','Encre et pastel':'Ink and pastel','Encre sur papier':'Ink on paper','Encre tricolore':'Tricolour ink','Encres couleur et crayon':'Coloured inks and pencil','Encres couleur et feutre':'Coloured inks and felt-tip pen','Feutre':'Felt-tip pen','Feutre Crayon':'Felt-tip pen and pencil','Feutre Crayon Stylo':'Felt-tip pen, pencil and pen','Feutre Fusain':'Felt-tip pen and charcoal','Feutre couleur':'Coloured felt-tip pen','Feutre couleur et Encre de Chine':'Coloured felt-tip pen and Indian ink','Feutre couleur, Crayon':'Coloured felt-tip pen, pencil','Feutre crayon':'Felt-tip pen and pencil','Feutre encre de Chine':'Felt-tip pen and Indian ink','Feutre et Bic':'Felt-tip pen and ballpoint pen','Feutre et Crayon couleur':'Felt-tip pen and coloured pencil','Feutre et Crayon et Fusain':'Felt-tip pen, pencil and charcoal','Feutre et Encre de Chine':'Felt-tip pen and Indian ink','Feutre et Encre de Chine et Crayon':'Felt-tip pen, Indian ink and pencil','Feutre et crayon':'Felt-tip pen and pencil','Feutre et crayon de couleur':'Felt-tip pen and coloured pencil','Feutre et stylo':'Felt-tip pen and pen','Feutre noir':'Black felt-tip pen','Feutre noir et Feutre couleur':'Black and coloured felt-tip pens','Feutre, Crayon':'Felt-tip pen, pencil','Feutre, Pastel':'Felt-tip pen, pastel','Fusain':'Charcoal','Fusain Feutre':'Charcoal and felt-tip pen','Gouache':'Gouache','Gouache et Encre de Chine':'Gouache and Indian ink','Gouache et Feutre':'Gouache and felt-tip pen','Huile':'Oil','Indéterminée':'Undetermined','Lithographie':'Lithograph','Marker et aquarelle':'Marker and watercolour','Pastel':'Pastel','Pastel et Encre de Chine':'Pastel and Indian ink','Pastel gras':'Oil pastel','Peinture (gouache ou acrylique)':'Painting (gouache or acrylic)','Peinture sur tirage photographique':'Painting on photographic print',"Peinture à l'huile":'Oil painting','Photo martelée':'Hammered photo','Photo martelée et Collage':'Hammered photo and collage','Photo martelée et encre':'Hammered photo and ink','Sculpture':'Sculpture','Sculpture assemblage':'Assemblage sculpture','Sculpture constructiviste':'Constructivist sculpture','Sculpture fil':'Wire sculpture','Stylo':'Pen','Stylo bille bleu':'Blue ballpoint pen','Stylo crayon feutre':'Pen, pencil and felt-tip pen','Stylo et marker':'Pen and marker','Stylo-bille bleu':'Blue ballpoint pen','Tableau-assemblage':'Assemblage painting','Technique mixte (collage)':'Mixed media (collage)','Technique mixte (photo + dessin)':'Mixed media (photo + drawing)','decoupage et Feutre':'Cutout and felt-tip pen','encre de chine':'Indian ink','encre de chine + lavis':'Indian ink and wash','encre de chine + lavis couleur':'Indian ink and colour wash','encre de chine + peinture':'Indian ink and paint','encre sépia ou feutre brun':'Sepia ink or brown felt-tip pen','pastel ou crayon de couleur':'Pastel or coloured pencil','peinture':'Painting','peinture au pinceau':'Brush painting','xxx':'Undetermined'}
+};
+var SUP_LABEL = {
+  es:{'Autoportrait':'Autorretrato fotográfico','Bande plâtrée':'Venda de escayola','Bois - contreplaqué':'Contrachapado','Bois et laine jaune et papier':'Madera, lana amarilla y papel','Bois peint et métal':'Madera pintada y metal','Bois polychrome':'Madera policromada','Bristol':'Cartulina bristol','Bristol (carte postale encadrée)':'Cartulina bristol (postal enmarcada)','Bristol carte postale':'Cartulina bristol postal','Bristol couleur':'Cartulina bristol de color','Canson':'Papel Canson','Canson carte postale':'Postal Canson','Canson gris':'Papel Canson gris','Carnet de croquis':'Cuaderno de bocetos','Carrelage (support atypique)':'Azulejo (soporte atípico)','Carrelage ou support rigide':'Azulejo o soporte rígido','Carte postale':'Postal','Carton':'Cartón','Carton brun':'Cartón marrón',"Carton d'emballage déplié":'Cartón de embalaje desplegado','Carton et bois et photo':'Cartón, madera y foto','Carton ondulé':'Cartón ondulado','Carton ou toile':'Cartón o lienzo','Carton quadrillé et éléments 3D':'Cartón cuadriculado y elementos 3D','Carton épais':'Cartón grueso','Diapositive':'Diapositiva','Diapositive 35mm':'Diapositiva 35mm','Diapositive couleur':'Diapositiva en color','Diapositive photographique':'Diapositiva fotográfica','Double page cahier':'Doble página de cuaderno','Encre sur papier et dés à jouer':'Tinta sobre papel y dados','Enveloppe postale':'Sobre postal','Feuille de classeur':'Hoja de archivador','Fil jaune et billes colorées':'Hilo amarillo y cuentas de colores','Grand format':'Gran formato','Inconnu':'Desconocido','Indéterminé':'Indeterminado','Mousse / liège et plâtre':'Espuma / corcho y yeso','Package alimentaire':'Envase alimentario','Papier':'Papel','Papier (carnet à spirale)':'Papel (cuaderno de espiral)','Papier (deux feuilles)':'Papel (dos hojas)','Papier Canson':'Papel Canson','Papier Canson teinté':'Papel Canson tintado','Papier Ingres':'Papel Ingres','Papier aquarelle':'Papel de acuarela','Papier blanc':'Papel blanco','Papier brillant teinté':'Papel brillante tintado','Papier brun ou gris':'Papel marrón o gris','Papier calque':'Papel vegetal','Papier encollé':'Papel encolado','Papier format panoramique':'Papel formato panorámico','Papier ingres':'Papel Ingres','Papier kraft':'Papel kraft','Papier ligné (carnet)':'Papel rayado (cuaderno)','Papier noir ou carton sombre':'Papel negro o cartón oscuro','Papier ou carton':'Papel o cartón','Papier photo':'Papel fotográfico','Papier quadrillé':'Papel cuadriculado','Papier quadrillé (carnet)':'Papel cuadriculado (cuaderno)','Papier quadrillé fin ou calque':'Papel cuadriculado fino o vegetal','Photo':'Foto','Photo ou Diapositif':'Foto o diapositiva','Support atypique dentelé':'Soporte atípico dentado','Tirage photographique':'Copia fotográfica','Toile':'Lienzo','bristol':'Cartulina bristol','canson 12x8':'Canson 12×8','carton ou papier épais':'Cartón o papel grueso','papier':'Papel','papier ou carton':'Papel o cartón','polystyrène':'Poliestireno'},
+  en:{'Autoportrait':'Self-portrait photo','Bande plâtrée':'Plaster strip','Bois - contreplaqué':'Plywood','Bois et laine jaune et papier':'Wood, yellow wool and paper','Bois peint et métal':'Painted wood and metal','Bois polychrome':'Polychrome wood','Bristol':'Bristol board','Bristol (carte postale encadrée)':'Bristol board (framed postcard)','Bristol carte postale':'Bristol board postcard','Bristol couleur':'Coloured Bristol board','Canson':'Canson paper','Canson carte postale':'Canson postcard','Canson gris':'Grey Canson paper','Carnet de croquis':'Sketchbook','Carrelage (support atypique)':'Tile (atypical support)','Carrelage ou support rigide':'Tile or rigid support','Carte postale':'Postcard','Carton':'Cardboard','Carton brun':'Brown cardboard',"Carton d'emballage déplié":'Unfolded packaging cardboard','Carton et bois et photo':'Cardboard, wood and photo','Carton ondulé':'Corrugated cardboard','Carton ou toile':'Cardboard or canvas','Carton quadrillé et éléments 3D':'Grid cardboard and 3D elements','Carton épais':'Thick cardboard','Diapositive':'Slide','Diapositive 35mm':'35mm slide','Diapositive couleur':'Colour slide','Diapositive photographique':'Photographic slide','Double page cahier':'Double notebook page','Encre sur papier et dés à jouer':'Ink on paper with dice','Enveloppe postale':'Postal envelope','Feuille de classeur':'Ring binder sheet','Fil jaune et billes colorées':'Yellow thread and coloured beads','Grand format':'Large format','Inconnu':'Unknown','Indéterminé':'Undetermined','Mousse / liège et plâtre':'Foam / cork and plaster','Package alimentaire':'Food packaging','Papier':'Paper','Papier (carnet à spirale)':'Paper (spiral notebook)','Papier (deux feuilles)':'Paper (two sheets)','Papier Canson':'Canson paper','Papier Canson teinté':'Tinted Canson paper','Papier Ingres':'Ingres paper','Papier aquarelle':'Watercolour paper','Papier blanc':'White paper','Papier brillant teinté':'Tinted glossy paper','Papier brun ou gris':'Brown or grey paper','Papier calque':'Tracing paper','Papier encollé':'Pasted paper','Papier format panoramique':'Panoramic format paper','Papier ingres':'Ingres paper','Papier kraft':'Kraft paper','Papier ligné (carnet)':'Lined paper (notebook)','Papier noir ou carton sombre':'Black paper or dark cardboard','Papier ou carton':'Paper or cardboard','Papier photo':'Photo paper','Papier quadrillé':'Grid paper','Papier quadrillé (carnet)':'Grid paper (notebook)','Papier quadrillé fin ou calque':'Fine grid or tracing paper','Photo':'Photo','Photo ou Diapositif':'Photo or slide','Support atypique dentelé':'Atypical serrated support','Tirage photographique':'Photographic print','Toile':'Canvas','bristol':'Bristol board','canson 12x8':'Canson 12×8','carton ou papier épais':'Cardboard or thick paper','papier':'Paper','papier ou carton':'Paper or cardboard','polystyrène':'Polystyrene'}
+};
+function techLabel(fr){ return (lang==='fr') ? fr : ((TECH_LABEL[lang]||{})[fr] || fr); }
+function supLabel(fr) { return (lang==='fr') ? fr : ((SUP_LABEL[lang]||{})[fr]  || fr); }
+
+/* ── Données API ── */
+var ADMIN_NAME  = '';
+var adminMode   = false;
+var VALID_NAMES = ['anita','jorge','anahi','roberto','luciano','mogdad','maora','shaima','amelle','malik','louise','alix','liza','myriam','elisabeth'];
+
 var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
 var API_URL  = API_BASE + '?api=1';
-
 var ITEMS = [], SHEET_ID = '', GID = '', APP_VERSION = '';
 var activeYears = {}, activeSeries = {}, searchQuery = '';
-
 var PINNED_TAGS = ['Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
 var SANS_TAG_KEY = '__aucun__';
 
-/* ── Helpers ── */
+/* ── Helpers généraux ── */
 function sHas(o,k){return Object.prototype.hasOwnProperty.call(o,String(k))}
 function sAdd(o,k){o[String(k)]=true}
 function sDel(o,k){delete o[String(k)]}
@@ -191,56 +521,53 @@ function sClear(o){var ks=Object.keys(o);for(var i=0;i<ks.length;i++)delete o[ks
 function sFromArr(a){var o={};if(a)for(var i=0;i<a.length;i++)o[String(a[i])]=true;return o}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
 
-/* ── Données ── */
-var SERIES_MAJOR = [
-  { name: 'Animaux',               desc: 'Chevaux, taureaux, oiseaux, chiens… Souvent en tension ou fusion avec le nu humain.' },
-  { name: 'Visages',               desc: 'Les visages où les détails sont travaillés avec précision, en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.' },
-  { name: 'SCIENS-ART',            desc: 'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes, une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.' },
-  { name: 'Musique',               desc: 'Pianistes, violoncellistes, bandónistes, violonistes. Les musiciens fusionnent avec leurs instruments jusqu’à la dissolution formelle. Lien profond avec la culture rioplatense.' },
-  { name: 'Paquebot',              desc: 'Navires dessinés avec une précision quasi technique, inscrits dans des paysages déjà peuplés. Figure de l’exil et du déplacement, motif autobiographique discret.' },
-  { name: 'Portraits',             desc: 'Visages très travaillés représentant proches ou personnes connues, regards frontaux d’une intensité inhabituelle.' },
-  { name: 'Manuscrit',             desc: 'Œuvres intégrant texte manuscrit : poèmes, fragments théoriques, dédicaces développées. L’écriture comme élément plastique à part entière.' },
-  { name: 'Supports Divers',       desc: 'Tout ce qui n’est pas le papier Canson habituel : carton, polystyrène, enveloppes, matériaux récupérés. Le support n’est jamais anodin, il altère le tracé, contraint le geste, transforme la surface en co-auteur de l’image.' },
-  { name: 'Martelés',         desc: 'Technique propre à Serralta : la reproduction photographique d’un dessin est collée sur une plaque de mousse expansive, puis martelée à la main pour créer un relief en creux. De l’encre est souvent ajoutée dans les zones martelées, révélant l’empreinte du geste. À mi-chemin entre dessin, estampe et sculpture.' },
-  { name: 'Diapo-Photo',           desc: 'Œuvres incluant des photos, ainsi que le travail sur diapositives.' },
-  { name: 'Diapogravure',          desc: 'Technique unique : travail direct sur diapositives 35 mm.' },
-  { name: 'Personnages Filiformes', desc: 'Serralta efface la masse des corps et réduit la figure à un tracé minimal, linéaire. Ce dépouillement détonne par rapport au caractère plantureux et charnel de la majorité de son œuvre.' },
-  { name: 'Politique',             desc: 'Les militaires, les drapeaux, les armes, les scènes de torture. Trace de l’exil et de la dictature uruguayenne, une présence rare mais explicite dans un corpus plutôt cosmologique.' },
-  { name: 'Habillés',         desc: 'Contrepoint aux nus omniprésents : chez Serralta, la nudité est l’état naturel. Un personnage habillé devient souvent porteur d’une symbolique (militaires, figures d’autorité…).' },
-  { name: 'Urbanisme',             desc: 'Paysages reconnaissables, croquis architecturaux, vues urbaines. Les rares moments où Serralta ancre la composition dans un espace géographique identifiable.' },
-  { name: 'Mise en abyme',         desc: 'La main, le doigt ou le stylo de l’artiste apparaît dans le dessin en train de dessiner. Geste réflexif classique, rare chez Serralta mais toujours délibéré.' },
-  { name: 'Sport',                 desc: 'Football, champs de courses, compétitions. Hommage à la culture populaire rioplatense, thème festif.' },
-  { name: 'Nus',                   desc: 'Motif le plus constant, présent dès 1976 et jamais abandonné. Corps multiple, frontal, intégré à la nature ou confronté à l’animal. Le nu est pour Serralta une syntaxe autant qu’un sujet.' },
-  { name: 'Études',           desc: 'Recherches formelles préparatoires ou autonomes : esquisses de figures, études de mains et de visages. Le laboratoire visible de la pratique de Serralta.' },
-  { name: 'Dédicaces',        desc: 'Œuvres offertes et dédicacées. Révèlent le réseau amical et intellectuel de Serralta : musiciens, architectes, poètes, famille.' },
-  { name: 'Illustrations Higinio Mena', desc: 'Illustrations réalisées pour les livres du poète uruguayen Higinio Mena. Seule collaboration éditoriale documentée de Serralta.' },
-  { name: 'Série peintures',  desc: 'Œuvres sur toile ou panneau, huile ou acrylique. Minoritaires dans le corpus mais témoignant d’une ambition de grand format absente du dessin.' },
-  { name: 'Sculptures',            desc: 'Production tridimensionnelle marginale mais documentée. Matériaux hétérogènes, formes issues du vocabulaire figuratif habituel.' },
-  { name: 'Croquis de voyage',     desc: 'Voyage d’études en Europe d’un jeune architecte uruguayen de 28 ans. Entre 1947 et 1960, Serralta (né en 1919) parcourt la France, l’Italie et l’Espagne, carnet en main : cathédrales gothiques, places italiennes, ponts parisiens, relevés cotés. Ces 209 dessins à l’encre ou au crayon, antérieurs à tout le reste du corpus, sont le seul témoignage visuel de sa formation européenne — avant l’exil, avant la dictature, avant SCIENS-ART.' }
+/* ── Données SERIES_MAJOR (clés FR stables) ── */
+var SERIES_MAJOR_KEYS = [
+  'Animaux','Visages','SCIENS-ART','Musique','Paquebot','Portraits','Manuscrit',
+  'Supports Divers','Martelés','Diapo-Photo','Diapogravure','Personnages Filiformes',
+  'Politique','Habillés','Urbanisme','Mise en abyme','Sport','Nus',
+  'Études','Dédicaces','Illustrations Higinio Mena','Série peintures',
+  'Sculptures','Croquis de voyage'
 ];
 
-/* Périodes chronologiques (ordre chronologique = plus lisible en cards) */
+/* ── Données CHRONO_YRS (labels multilingues inline) ── */
 var CHRONO_YRS = [
-  ["1919–1947", ["1919","1920","1921","1922","1923","1924","1925","1926","1927","1928","1929","1930","1931","1932","1933","1934","1935","1936","1937","1938","1939","1940","1941","1942","1943","1944","1945","1946","1947"], "Uruguay · Melo, Montevideo — Enfance et études"],
-  ["1947–1948", ["1947","1948"], "Voyage d’études en Europe"],
-  ["1949–1950", ["1949","1950"], "France · Paris — Le Corbusier"],
-  ["1951–1974", ["1951","1952","1953","1954","1955","1956","1957","1958","1959","1960","1961","1962","1963","1964","1965","1966","1967","1968","1969","1970","1971","1972","1973","1974"], "Uruguay · Dictature militaire — Exil"],
-  ["1974–1976", ["1974","1975","1976"], "France · Paris/Saint-Étienne — École d’architecture"],
-  ["1977–1988", ["1977","1978","1979","1980","1981","1982","1983","1984","1985","1986","1987","1988"], "France · Paris/Rennes — École d’architecture"],
-  ["1988–2011", ["1988","1989","1990","1991","1992","1993","1994","1995","1996","1997","1998","1999","2000","2001","2002","2003","2004","2005","2006","2007","2008","2009","2010","2011"], "France · Jullouville — Retraite"]
+  ['1919–1947',
+    ['1919','1920','1921','1922','1923','1924','1925','1926','1927','1928','1929','1930','1931','1932','1933','1934','1935','1936','1937','1938','1939','1940','1941','1942','1943','1944','1945','1946','1947'],
+    {fr:'Uruguay · Melo, Montevideo — Enfance et études', es:'Uruguay · Melo, Montevideo — Infancia y estudios', en:'Uruguay · Melo, Montevideo — Childhood and studies'}],
+  ['1947–1948',
+    ['1947','1948'],
+    {fr:'Voyage d’études en Europe', es:'Viaje de estudios por Europa', en:'Study trip across Europe'}],
+  ['1949–1950',
+    ['1949','1950'],
+    {fr:'France · Paris — Le Corbusier', es:'Francia · París — Le Corbusier', en:'France · Paris — Le Corbusier'}],
+  ['1951–1974',
+    ['1951','1952','1953','1954','1955','1956','1957','1958','1959','1960','1961','1962','1963','1964','1965','1966','1967','1968','1969','1970','1971','1972','1973','1974'],
+    {fr:'Uruguay · Dictature militaire — Exil', es:'Uruguay · Dictadura militar — Exilio', en:'Uruguay · Military dictatorship — Exile'}],
+  ['1974–1976',
+    ['1974','1975','1976'],
+    {fr:'France · Paris/Saint-Étienne — École d’architecture', es:'Francia · París/Saint-Étienne — Escuela de arquitectura', en:'France · Paris/Saint-Étienne — School of architecture'}],
+  ['1977–1988',
+    ['1977','1978','1979','1980','1981','1982','1983','1984','1985','1986','1987','1988'],
+    {fr:'France · Paris/Rennes — École d’architecture', es:'Francia · París/Rennes — Escuela de arquitectura', en:'France · Paris/Rennes — School of architecture'}],
+  ['1988–2011',
+    ['1988','1989','1990','1991','1992','1993','1994','1995','1996','1997','1998','1999','2000','2001','2002','2003','2004','2005','2006','2007','2008','2009','2010','2011'],
+    {fr:'France · Jullouville — Retraite', es:'Francia · Jullouville — Jubilación', en:'France · Jullouville — Retirement'}]
 ];
 
 /* ── Startup ── */
 document.addEventListener('DOMContentLoaded', startApp);
 
 function startApp() {
+  document.documentElement.lang = lang;
   var msg = document.getElementById('load-msg');
   var sub = document.getElementById('load-sub');
-  if (sub) sub.textContent = 'Connexion au catalogue…';
+  if (msg) msg.textContent = T('loading');
+  if (sub) sub.textContent = T('connecting');
   fetch(API_URL)
     .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
     .then(function(resp) {
-      if (msg) msg.textContent = 'Chargement de ' + resp.items.length + ' œuvres…';
+      if (msg) msg.textContent = Tn('loading_n', resp.items.length);
       ITEMS = resp.items.map(function(a) {
         return { ref:a[0], annee:a[1], technique:a[2], support:a[3],
                  serie:a[4], ico:a[5], crit:a[6], image_url:a[7], _row:a[8] };
@@ -249,7 +576,7 @@ function startApp() {
       init();
     })
     .catch(function(err) {
-      if (msg) { msg.className = 'err-msg'; msg.textContent = 'Impossible de charger le catalogue.'; }
+      if (msg) { msg.className = 'err-msg'; msg.textContent = T('error'); }
       if (sub) sub.textContent = err.message;
     });
 }
@@ -257,6 +584,14 @@ function startApp() {
 function init() {
   document.getElementById('loading').style.display = 'none';
   document.getElementById('main-nav').style.display = 'flex';
+  /* Labels UI */
+  document.getElementById('tab-galerie').textContent    = T('tab_galerie');
+  document.getElementById('tab-collections').textContent= T('tab_collections');
+  document.getElementById('lbl-annees').textContent     = T('lbl_annees');
+  document.getElementById('lbl-style').textContent      = T('lbl_style');
+  document.getElementById('lbl-series').textContent     = T('lbl_series');
+  document.getElementById('search-input').placeholder   = T('search_ph');
+  document.getElementById('clear-btn').textContent      = T('btn_clear');
   buildFilterChips();
   buildCollections();
   renderGallery();
@@ -272,8 +607,7 @@ function seriesYearRange(name) {
     if (!isNaN(y)) { yrs.push(y); yc[y] = (yc[y] || 0) + 1; }
   }
   if (!yrs.length) return null;
-  var mn = Math.min.apply(null, yrs), mx = Math.max.apply(null, yrs);
-  return { min: mn, max: mx };
+  return { min: Math.min.apply(null, yrs), max: Math.max.apply(null, yrs) };
 }
 function countForYears(years) {
   var n = 0;
@@ -282,12 +616,10 @@ function countForYears(years) {
   return n;
 }
 
-/* ── Construction onglet Collections ── */
+/* ── Collections ── */
 function buildCollections() {
-  var cv = document.getElementById('coll-view');
-  cv.innerHTML = '';
-  var i;
-  var HIDDEN = ['Couleur', 'Noir et Blanc', 'Nus', 'France', 'Italie', 'Espagne'];
+  var cv = document.getElementById('coll-view'); cv.innerHTML = '';
+  var i, HIDDEN = ['Couleur','Noir et Blanc','Nus','France','Italie','Espagne'];
 
   /* Comptage global */
   var scountAll = {};
@@ -298,8 +630,6 @@ function buildCollections() {
       if (sp) scountAll[sp] = (scountAll[sp] || 0) + 1;
     }
   }
-
-  /* Top 5 (hors HIDDEN) */
   var sortedAll = [];
   for (var k in scountAll)
     if (sHas(scountAll, k) && HIDDEN.indexOf(k) === -1) sortedAll.push([k, scountAll[k]]);
@@ -308,39 +638,29 @@ function buildCollections() {
   var top5names = {};
   for (i = 0; i < top5.length; i++) top5names[top5[i][0]] = true;
 
-  /* descMap */
-  var descMap = {};
-  for (i = 0; i < SERIES_MAJOR.length; i++) descMap[SERIES_MAJOR[i].name] = SERIES_MAJOR[i].desc;
-
-  /* ─────────────────────────────────────────
-     Section 1 : Grandes séries (smc top 5)
-  ───────────────────────────────────────── */
+  /* ─── Section 1 : Grandes séries ─── */
   var s1 = document.createElement('div'); s1.className = 'coll-section';
   var t1 = document.createElement('p'); t1.className = 'coll-title';
-  t1.textContent = 'Les grandes séries';
-  s1.appendChild(t1);
+  t1.textContent = T('sec_grandes'); s1.appendChild(t1);
   var mg = document.createElement('div'); mg.className = 'series-major-grid';
   for (i = 0; i < top5.length; i++) {
+    var key = top5[i][0];
     var sc = document.createElement('div'); sc.className = 'smc';
-    var rng = seriesYearRange(top5[i][0]);
+    var rng = seriesYearRange(key);
     var rngH = rng ? '<div class="smc-range">' + rng.min + (rng.max !== rng.min ? '–' + rng.max : '') + '</div>' : '';
-    sc.innerHTML = '<div class="smc-title">' + esc(top5[i][0]) + '</div>' +
+    sc.innerHTML = '<div class="smc-title">' + esc(tagLabel(key)) + '</div>' +
       '<div class="smc-n">' + top5[i][1] + '</div>' + rngH +
-      '<div class="smc-desc">' + (descMap[top5[i][0]] || '') + '</div>';
-    (function(nm) { sc.onclick = function() { openGallery([], [nm]); }; })(top5[i][0]);
+      '<div class="smc-desc">' + sDesc(key) + '</div>';
+    (function(nm) { sc.onclick = function() { openGallery([], [nm]); }; })(key);
     mg.appendChild(sc);
   }
-  s1.appendChild(mg);
-  cv.appendChild(s1);
+  s1.appendChild(mg); cv.appendChild(s1);
 
-  /* ─────────────────────────────────────────
-     Section 2 : Toutes les séries (entry-card)
-  ───────────────────────────────────────── */
+  /* ─── Section 2 : Toutes les séries ─── */
   var s2 = document.createElement('div'); s2.className = 'coll-section';
   var hr1 = document.createElement('hr'); hr1.className = 'coll-divider'; s2.appendChild(hr1);
   var t2 = document.createElement('p'); t2.className = 'coll-title';
-  t2.textContent = 'Toutes les séries';
-  s2.appendChild(t2);
+  t2.textContent = T('sec_toutes'); s2.appendChild(t2);
   var ag = document.createElement('div'); ag.className = 'series-all-grid';
   for (var sri = 0; sri < sortedAll.length; sri++) {
     var snm = sortedAll[sri][0], scnt = sortedAll[sri][1];
@@ -348,36 +668,31 @@ function buildCollections() {
     var ac = document.createElement('div'); ac.className = 'entry-card';
     var rng2 = seriesYearRange(snm);
     var rngH2 = rng2 ? '<div class="ec-range">' + rng2.min + (rng2.max !== rng2.min ? '–' + rng2.max : '') + '</div>' : '';
-    ac.innerHTML = '<div class="entry-card-title">' + esc(snm) + '</div>' +
-      '<div class="entry-card-count">' + scnt + ' œuvres</div>' + rngH2 +
-      (descMap[snm] ? '<div class="entry-card-desc">' + descMap[snm] + '</div>' : '');
+    ac.innerHTML = '<div class="entry-card-title">' + esc(tagLabel(snm)) + '</div>' +
+      '<div class="entry-card-count">' + scnt + ' ' + T('works') + '</div>' + rngH2 +
+      (sDesc(snm) ? '<div class="entry-card-desc">' + sDesc(snm) + '</div>' : '');
     (function(nm) { ac.onclick = function() { openGallery([], [nm]); }; })(snm);
     ag.appendChild(ac);
   }
-  s2.appendChild(ag);
-  cv.appendChild(s2);
+  s2.appendChild(ag); cv.appendChild(s2);
 
-  /* ─────────────────────────────────────────
-     Section 3 : Périodes (entry-card)
-  ───────────────────────────────────────── */
+  /* ─── Section 3 : Périodes ─── */
   var s3 = document.createElement('div'); s3.className = 'coll-section';
   var hr2 = document.createElement('hr'); hr2.className = 'coll-divider'; s3.appendChild(hr2);
   var t3 = document.createElement('p'); t3.className = 'coll-title';
-  t3.textContent = 'Périodes';
-  s3.appendChild(t3);
+  t3.textContent = T('sec_periodes'); s3.appendChild(t3);
   var pg = document.createElement('div'); pg.className = 'series-all-grid';
   for (i = 0; i < CHRONO_YRS.length; i++) {
     var cy = CHRONO_YRS[i], lbl = cy[0], yrs = cy[1], ev = cy[2];
     var cnt = countForYears(yrs);
     var pc = document.createElement('div'); pc.className = 'entry-card';
     pc.innerHTML = '<div class="entry-card-title">' + esc(lbl) + '</div>' +
-      '<div class="entry-card-count">' + cnt + ' œuvres</div>' +
-      (ev ? '<div class="entry-card-event">' + esc(ev) + '</div>' : '');
+      '<div class="entry-card-count">' + cnt + ' ' + T('works') + '</div>' +
+      '<div class="entry-card-event">' + esc(ev[lang] || ev.fr) + '</div>';
     (function(y) { pc.onclick = function() { openGallery(y, []); }; })(yrs);
     pg.appendChild(pc);
   }
-  s3.appendChild(pg);
-  cv.appendChild(s3);
+  s3.appendChild(pg); cv.appendChild(s3);
 }
 
 /* ── Onglets ── */
@@ -389,7 +704,6 @@ function switchMainTab(tab) {
   document.getElementById('collections-tab').style.display = tab === 'collections' ? 'block' : 'none';
 }
 
-/* ── Ouvrir galerie filtrée (depuis Collections) ── */
 function openGallery(years, series) {
   activeYears = sFromArr(years); activeSeries = sFromArr(series);
   switchMainTab('galerie');
@@ -399,8 +713,7 @@ function openGallery(years, series) {
   document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c) {
     c.className = sHas(activeSeries, c.getAttribute('data-s')) ? 'chip active' : 'chip';
   });
-  enforceMinFilter(); renderGallery();
-  window.scrollTo(0, 0);
+  enforceMinFilter(); renderGallery(); window.scrollTo(0, 0);
 }
 
 /* ── Chips filtres ── */
@@ -418,8 +731,6 @@ function buildFilterChips() {
     (function(y, b) { b.onclick = function() { toggleYear(y, b); }; })(years[i], yb);
     yc.appendChild(yb);
   }
-
-  /* Comptage séries thématiques */
   var scount2 = {};
   for (i = 0; i < ITEMS.length; i++) {
     var pts = (ITEMS[i].serie || '').split('|');
@@ -432,20 +743,16 @@ function buildFilterChips() {
   for (var sk in scount2) if (sHas(scount2, sk)) skeys.push(sk);
   skeys.sort(function(a, b) { return scount2[b] - scount2[a]; });
 
-  function makeChip(key, label) {
+  function makeChip(key) {
     var b = document.createElement('button');
-    b.className = 'chip'; b.setAttribute('data-s', key); b.textContent = label;
+    b.className = 'chip'; b.setAttribute('data-s', key); b.textContent = tagLabel(key);
     (function(k, btn) { btn.onclick = function() { toggleSerie(k, btn); }; })(key, b);
     return b;
   }
-
-  /* Ligne Style : PINNED_TAGS uniquement */
   var sc1 = document.getElementById('serie-chips-class');
-  for (i = 0; i < PINNED_TAGS.length; i++) sc1.appendChild(makeChip(PINNED_TAGS[i], PINNED_TAGS[i]));
-
-  /* Ligne Séries : thématiques triées par count */
+  for (i = 0; i < PINNED_TAGS.length; i++) sc1.appendChild(makeChip(PINNED_TAGS[i]));
   var sc2 = document.getElementById('serie-chips-theme');
-  for (i = 0; i < skeys.length; i++) sc2.appendChild(makeChip(skeys[i], skeys[i]));
+  for (i = 0; i < skeys.length; i++) sc2.appendChild(makeChip(skeys[i]));
 }
 
 function toggleYear(y, btn) {
@@ -487,7 +794,7 @@ function filterItems() {
     }
     var textOk = noSearch;
     if (!textOk) {
-      var h = [it.ref, it.serie, it.ico, it.technique, it.support].join(' ').toLowerCase();
+      var h = [it.ref, it.serie, it.technique, it.support].join(' ').toLowerCase();
       textOk = h.indexOf(searchQuery) !== -1;
     }
     if (yearOk && serieOk && textOk) result.push(it);
@@ -497,7 +804,6 @@ function filterItems() {
 
 function renderGallery() {
   var filtered = filterItems();
-  /* Tri : datés d'abord (par ref), SansDate en fin */
   filtered.sort(function(a, b) {
     var aSD = String(a.ref).indexOf('SansDate') === 0 ? 1 : 0;
     var bSD = String(b.ref).indexOf('SansDate') === 0 ? 1 : 0;
@@ -505,7 +811,7 @@ function renderGallery() {
     return String(a.ref) < String(b.ref) ? -1 : String(a.ref) > String(b.ref) ? 1 : 0;
   });
   var fc = document.getElementById('filter-count');
-  if (fc) fc.textContent = filtered.length + ' / ' + ITEMS.length + ' œuvres';
+  if (fc) fc.textContent = filtered.length + ' / ' + ITEMS.length + ' ' + T('works');
   var grid = document.getElementById('grid'); grid.innerHTML = '';
   for (var i = 0; i < filtered.length; i++) {
     var it = filtered[i];
@@ -513,14 +819,15 @@ function renderGallery() {
     var tagsHtml = '';
     for (var j = 0; j < tags.length; j++) {
       var t = tags[j].trim();
-      if (t) tagsHtml += '<span class="tag" onclick="addSerieFilter(\'' + esc(t) + '\')">' + esc(t) + '</span>';
+      if (t) tagsHtml += '<span class="tag" onclick="addSerieFilter(\'' + esc(t) + '\')">' + esc(tagLabel(t)) + '</span>';
     }
-    var tech = [it.technique, it.support].filter(Boolean).join(' / ');
+    var tech = [it.technique ? techLabel(it.technique) : '', it.support ? supLabel(it.support) : ''].filter(Boolean).join(' / ');
     var imgSafe = (it.image_url || '').replace(/'/g, '&#39;');
     var card = document.createElement('div'); card.className = 'card';
     card.innerHTML =
       '<div class="card-img"><img src="' + (it.image_url || '') + '" alt="' + esc(it.ref) + '"' +
       ' onerror="this.style.display=\'none\'" onclick="openLB(\'' + imgSafe + '\')"></div>' +
+      '<button class="card-tag-edit" onclick="openTagEditor(' + it._row + ')" title="Modifier les tags">🏷</button>' +
       '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
       '<div class="card-ref">' + esc(it.ref) + '</div>' +
       (tech ? '<div class="card-tech">' + esc(tech) + '</div>' : '') +
@@ -535,6 +842,193 @@ function addSerieFilter(s) {
     if (c.getAttribute('data-s') === s) c.className = 'chip active';
   });
   enforceMinFilter(); renderGallery();
+}
+
+/* ── Tag editor ── */
+var tagEditorRow = null;
+var tagEditorSelected = [];
+
+function openTagEditor(row) {
+  if (!adminMode) return;
+  var item = null;
+  for (var i = 0; i < ITEMS.length; i++) { if (ITEMS[i]._row === row) { item = ITEMS[i]; break; } }
+  if (!item) return;
+  tagEditorRow = row;
+  tagEditorSelected = (item.serie || '').split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+  document.getElementById('tag-drawer-ref').textContent = item.ref;
+  document.getElementById('tag-drawer-img-el').src = item.image_url || '';
+  document.getElementById('tag-save-status').textContent = '';
+  document.getElementById('tag-save-btn').disabled = false;
+  document.getElementById('tag-save-btn').textContent = 'Enregistrer';
+
+  var allSeries = [], seen = {};
+  for (var j = 0; j < ITEMS.length; j++) {
+    var pts = (ITEMS[j].serie || '').split('|');
+    for (var k = 0; k < pts.length; k++) {
+      var s = pts[k].trim();
+      if (s && !seen[s.toLowerCase()] && PINNED_TAGS.indexOf(s) === -1) {
+        seen[s.toLowerCase()] = true; allSeries.push(s);
+      }
+    }
+  }
+  allSeries.sort();
+
+  var list = document.getElementById('tag-list'); list.innerHTML = '';
+  document.getElementById('tag-required-err').style.display = 'none';
+  document.getElementById('tag-new-err').style.display = 'none';
+
+  function makeTagRow(tag, pinned) {
+    var isChk = tagEditorSelected.indexOf(tag) !== -1;
+    var lbl = document.createElement('label');
+    lbl.className = 'tag-check-row' + (isChk ? ' checked' : '') + (pinned ? ' tag-pinned' : '');
+    var cb = document.createElement('input');
+    cb.type = 'checkbox'; cb.checked = isChk; cb.setAttribute('data-tag', tag);
+    (function(t, label, checkbox) {
+      checkbox.onchange = function() {
+        if (this.checked) {
+          if (tagEditorSelected.length >= 5) { this.checked = false; return; }
+          tagEditorSelected.push(t);
+          label.className = 'tag-check-row' + (pinned ? ' tag-pinned' : '') + ' checked';
+        } else {
+          tagEditorSelected = tagEditorSelected.filter(function(x) { return x !== t; });
+          label.className = 'tag-check-row' + (pinned ? ' tag-pinned' : '');
+        }
+        document.getElementById('tag-count').textContent = tagEditorSelected.length + ' / 5';
+        document.getElementById('tag-required-err').style.display = 'none';
+      };
+    })(tag, lbl, cb);
+    lbl.appendChild(cb); lbl.appendChild(document.createTextNode(' ' + tag));
+    return lbl;
+  }
+
+  for (var p = 0; p < PINNED_TAGS.length; p++) list.appendChild(makeTagRow(PINNED_TAGS[p], true));
+  var sep = document.createElement('div'); sep.className = 'tag-separator'; list.appendChild(sep);
+  for (var m = 0; m < allSeries.length; m++) list.appendChild(makeTagRow(allSeries[m], false));
+
+  document.getElementById('tag-count').textContent = tagEditorSelected.length + ' / 5';
+  document.getElementById('tag-panel').className = 'open';
+}
+
+function openLBFromTag() {
+  var img = document.getElementById('tag-drawer-img-el');
+  if (img && img.src) openLB(img.src);
+}
+
+function closeTagEditor() {
+  document.getElementById('tag-panel').className = '';
+  tagEditorRow = null; tagEditorSelected = [];
+}
+
+function saveTagEditor() {
+  if (!tagEditorRow || !ADMIN_NAME) return;
+  var hasPinned = tagEditorSelected.some(function(t) { return PINNED_TAGS.indexOf(t) !== -1; });
+  if (!hasPinned) {
+    document.getElementById('tag-required-err').style.display = 'block';
+    return;
+  }
+  var btn = document.getElementById('tag-save-btn');
+  btn.textContent = '…'; btn.disabled = true;
+  var tagsParam = encodeURIComponent(tagEditorSelected.join('|'));
+  var cbName = '_ut' + tagEditorRow + '_' + Date.now();
+  var script = document.createElement('script');
+  window[cbName] = function(data) {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (!data.ok) {
+      btn.textContent = 'Erreur'; btn.disabled = false;
+      document.getElementById('tag-save-status').textContent = 'Erreur: ' + (data.error || '');
+      return;
+    }
+    for (var i = 0; i < ITEMS.length; i++) {
+      if (ITEMS[i]._row === tagEditorRow) { ITEMS[i].serie = data.serie; break; }
+    }
+    closeTagEditor(); renderGallery();
+  };
+  script.onerror = function() { btn.textContent = 'Erreur'; btn.disabled = false; };
+  script.src = API_BASE + '?action=updateTags&token=' + encodeURIComponent(ADMIN_NAME) + '&row=' + tagEditorRow + '&tags=' + tagsParam + '&callback=' + cbName;
+  document.head.appendChild(script);
+}
+
+function addNewTag() {
+  var inp = document.getElementById('tag-new-input');
+  var errEl = document.getElementById('tag-new-err');
+  var tag = inp.value.trim();
+  errEl.style.display = 'none';
+  if (!tag) return;
+  var list = document.getElementById('tag-list');
+  var existing = list.querySelectorAll('input[type=checkbox]');
+  for (var i = 0; i < existing.length; i++) {
+    if (existing[i].getAttribute('data-tag').toLowerCase() === tag.toLowerCase()) {
+      errEl.textContent = 'Ce tag existe déjà.'; errEl.style.display = 'block';
+      inp.select(); return;
+    }
+  }
+  if (tagEditorSelected.length < 4) tagEditorSelected.push(tag);
+  var lbl = document.createElement('label'); lbl.className = 'tag-check-row checked';
+  var cb = document.createElement('input');
+  cb.type = 'checkbox'; cb.checked = true; cb.setAttribute('data-tag', tag);
+  (function(t, label, checkbox) {
+    checkbox.onchange = function() {
+      if (this.checked) {
+        if (tagEditorSelected.length >= 4) { this.checked = false; return; }
+        tagEditorSelected.push(t); label.className = 'tag-check-row checked';
+      } else {
+        tagEditorSelected = tagEditorSelected.filter(function(x) { return x !== t; });
+        label.className = 'tag-check-row';
+      }
+      document.getElementById('tag-count').textContent = tagEditorSelected.length + ' / 5';
+    };
+  })(tag, lbl, cb);
+  lbl.appendChild(cb); lbl.appendChild(document.createTextNode(' ' + tag));
+  var inserted = false;
+  for (var j = 0; j < existing.length; j++) {
+    if (existing[j].getAttribute('data-tag').localeCompare(tag) > 0) {
+      list.insertBefore(lbl, existing[j].parentElement); inserted = true; break;
+    }
+  }
+  if (!inserted) list.appendChild(lbl);
+  document.getElementById('tag-count').textContent = tagEditorSelected.length + ' / 5';
+  inp.value = '';
+  var cbName = '_at' + Date.now();
+  var script = document.createElement('script');
+  window[cbName] = function(data) {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (data.error) { errEl.textContent = 'Erreur Sheet: ' + data.error; errEl.style.display = 'block'; }
+  };
+  script.src = API_BASE + '?action=addTag&token=' + encodeURIComponent(ADMIN_NAME) + '&tag=' + encodeURIComponent(tag) + '&callback=' + cbName;
+  document.head.appendChild(script);
+}
+
+/* ── Admin ── */
+function toggleAdmin() {
+  if (adminMode) {
+    adminMode = false; ADMIN_NAME = '';
+    document.body.classList.remove('admin-on');
+    var lb = document.getElementById('lock-btn');
+    lb.classList.remove('unlocked'); lb.title = 'Administration';
+  } else {
+    document.getElementById('admin-pwd').value = '';
+    document.getElementById('admin-err').textContent = '';
+    document.getElementById('admin-modal').style.display = 'flex';
+    setTimeout(function(){ document.getElementById('admin-pwd').focus(); }, 50);
+  }
+}
+function closeAdminModal(){ document.getElementById('admin-modal').style.display = 'none'; }
+function checkAdmin() {
+  var input = document.getElementById('admin-pwd').value.trim().toLowerCase();
+  if (VALID_NAMES.indexOf(input) !== -1) {
+    ADMIN_NAME = input.charAt(0).toUpperCase() + input.slice(1);
+    adminMode = true;
+    document.body.classList.add('admin-on');
+    var lb = document.getElementById('lock-btn');
+    lb.classList.add('unlocked'); lb.title = ADMIN_NAME + ' connecté·e';
+    closeAdminModal();
+  } else {
+    document.getElementById('admin-err').textContent = 'Prénom non reconnu';
+    document.getElementById('admin-pwd').value = '';
+    document.getElementById('admin-pwd').focus();
+  }
 }
 
 /* ── Lightbox ── */

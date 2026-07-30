@@ -38,7 +38,10 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 /* range slider années */
 .yr-range-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
 .yr-lbl{font-size:11px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;
-  white-space:nowrap;min-width:30px;text-align:center}
+  white-space:nowrap;width:38px;text-align:center;border:none;border-bottom:1px solid var(--rule);
+  background:transparent;font-family:inherit;padding:1px 2px;outline:none;-moz-appearance:textfield}
+.yr-lbl::-webkit-inner-spin-button,.yr-lbl::-webkit-outer-spin-button{-webkit-appearance:none}
+.yr-lbl:focus{border-bottom-color:var(--ink)}
 .yr-track-wrap{position:relative;flex:1;height:20px;display:flex;align-items:center}
 .yr-track{position:absolute;left:0;right:0;height:3px;background:var(--rule);border-radius:2px}
 .yr-fill{position:absolute;height:3px;background:var(--ink);border-radius:2px}
@@ -236,14 +239,14 @@ body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit{display:flex}
     <div class="filter-row" style="align-items:center;gap:6px;flex-wrap:wrap">
       <span class="filter-label" id="lbl-annees"></span>
       <div class="yr-range-wrap">
-        <span class="yr-lbl" id="yr-low-lbl"></span>
+        <input type="number" class="yr-lbl" id="yr-low-lbl" onchange="onYearLowInput(this.value)">
         <div class="yr-track-wrap">
           <div class="yr-track"></div>
           <div class="yr-fill" id="yr-fill"></div>
           <input type="range" id="yr-low" oninput="onYearLow()">
           <input type="range" id="yr-high" oninput="onYearHigh()">
         </div>
-        <span class="yr-lbl" id="yr-high-lbl"></span>
+        <input type="number" class="yr-lbl" id="yr-high-lbl" onchange="onYearHighInput(this.value)">
       </div>
       <label class="sansdate-lbl">
         <input type="checkbox" id="chk-sansdate" onchange="onSansDateToggle()">
@@ -351,8 +354,9 @@ var LANG = {
     loading_n:      'Chargement de {n} œuvres…',
     error:          'Impossible de charger le catalogue.',
     lbl_sansdate:   'Sans date',
-    /* Tags : clé FR = valeur affichée → pas de dict nécessaire, fallback sur la clé */
-    tags: {},
+    tags: {
+      'Sélection': 'Notre sélection'
+    },
     descs: {
       'Sélection':             'Une centaine d\'œuvres choisies pour introduire le corpus : représentatives de chaque période, de chaque technique et de chaque registre. Point d\'entrée recommandé.',
       'Animaux':               'Chevaux, taureaux, oiseaux, chiens… Souvent en tension ou fusion avec le nu humain.',
@@ -401,7 +405,7 @@ var LANG = {
     error:          'Imposible cargar el catálogo.',
     lbl_sansdate:   'Sin fecha',
     tags: {
-      'Sélection':             'Selección',
+      'Sélection':             'Nuestra selección',
       'Animaux':               'Animales',
       'Visages':               'Rostros',
       'Musique':               'Música',
@@ -482,7 +486,7 @@ var LANG = {
     error:          'Unable to load catalogue.',
     lbl_sansdate:   'Undated',
     tags: {
-      'Sélection':             'Selection',
+      'Sélection':             'Our selection',
       'Animaux':               'Animals',
       'Visages':               'Faces',
       'Musique':               'Music',
@@ -571,7 +575,7 @@ var API_URL  = API_BASE + '?api=1';
 var ITEMS = [], SHEET_ID = '', GID = '', APP_VERSION = '';
 var activeSeries = {}, searchQuery = '';
 var YEAR_MIN = 0, YEAR_MAX = 0, yearMin = 0, yearMax = 0, includeSansDate = true;
-var PINNED_TAGS = ['Sélection', 'Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
+var PINNED_TAGS = ['Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
 var SANS_TAG_KEY = '__aucun__';
 
 /* ── Helpers généraux ── */
@@ -695,7 +699,7 @@ function init() {
   buildFilterChips();
   /* Sélection active par défaut */
   sAdd(activeSeries, 'Sélection');
-  document.querySelectorAll('#serie-chips-class .chip').forEach(function(c) {
+  document.querySelectorAll('#serie-chips-theme .chip').forEach(function(c) {
     if (c.getAttribute('data-s') === 'Sélection') c.className = 'chip active';
   });
   buildCollections();
@@ -822,8 +826,8 @@ function openGallery(years, series) {
     yearMin = YEAR_MIN; yearMax = YEAR_MAX;
   }
   var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
-  if (lo) { lo.value = yearMin; document.getElementById('yr-low-lbl').textContent = yearMin; }
-  if (hi) { hi.value = yearMax; document.getElementById('yr-high-lbl').textContent = yearMax; }
+  if (lo) { lo.value = yearMin; document.getElementById('yr-low-lbl').value = yearMin; }
+  if (hi) { hi.value = yearMax; document.getElementById('yr-high-lbl').value = yearMax; }
   updateYearFill();
   document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c) {
     c.className = sHas(activeSeries, c.getAttribute('data-s')) ? 'chip active' : 'chip';
@@ -845,8 +849,10 @@ function buildYearSlider() {
   var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
   lo.min = hi.min = YEAR_MIN; lo.max = hi.max = YEAR_MAX;
   lo.value = YEAR_MIN; hi.value = YEAR_MAX;
-  document.getElementById('yr-low-lbl').textContent  = YEAR_MIN;
-  document.getElementById('yr-high-lbl').textContent = YEAR_MAX;
+  var lblLo = document.getElementById('yr-low-lbl');
+  var lblHi = document.getElementById('yr-high-lbl');
+  lblLo.min = lblHi.min = YEAR_MIN; lblLo.max = lblHi.max = YEAR_MAX;
+  lblLo.value = YEAR_MIN; lblHi.value = YEAR_MAX;
   document.getElementById('chk-sansdate').checked = true;
   updateYearFill();
 }
@@ -865,19 +871,35 @@ function onYearLow() {
   var lo = document.getElementById('yr-low');
   yearMin = Math.min(parseInt(lo.value), yearMax);
   lo.value = yearMin;
-  document.getElementById('yr-low-lbl').textContent = yearMin;
+  document.getElementById('yr-low-lbl').value = yearMin;
   updateYearFill(); enforceMinFilter(); renderGallery();
 }
 function onYearHigh() {
   var hi = document.getElementById('yr-high');
   yearMax = Math.max(parseInt(hi.value), yearMin);
   hi.value = yearMax;
-  document.getElementById('yr-high-lbl').textContent = yearMax;
+  document.getElementById('yr-high-lbl').value = yearMax;
   updateYearFill(); enforceMinFilter(); renderGallery();
 }
 function onSansDateToggle() {
   includeSansDate = document.getElementById('chk-sansdate').checked;
   enforceMinFilter(); renderGallery();
+}
+function onYearLowInput(val) {
+  var v = Math.max(YEAR_MIN, Math.min(parseInt(val) || YEAR_MIN, yearMax));
+  yearMin = v;
+  var lo = document.getElementById('yr-low');
+  lo.value = v;
+  document.getElementById('yr-low-lbl').value = v;
+  updateYearFill(); enforceMinFilter(); renderGallery();
+}
+function onYearHighInput(val) {
+  var v = Math.min(YEAR_MAX, Math.max(parseInt(val) || YEAR_MAX, yearMin));
+  yearMax = v;
+  var hi = document.getElementById('yr-high');
+  hi.value = v;
+  document.getElementById('yr-high-lbl').value = v;
+  updateYearFill(); enforceMinFilter(); renderGallery();
 }
 
 /* ── Chips filtres ── */
@@ -889,7 +911,7 @@ function buildFilterChips() {
     var pts = (ITEMS[i].serie || '').split('|');
     for (var j = 0; j < pts.length; j++) {
       var sv = pts[j].trim();
-      if (sv && PINNED_TAGS.indexOf(sv) === -1) scount2[sv] = (scount2[sv] || 0) + 1;
+      if (sv && sv !== 'Sélection' && PINNED_TAGS.indexOf(sv) === -1) scount2[sv] = (scount2[sv] || 0) + 1;
     }
   }
   var skeys = [];
@@ -905,6 +927,7 @@ function buildFilterChips() {
   var sc1 = document.getElementById('serie-chips-class');
   for (i = 0; i < PINNED_TAGS.length; i++) sc1.appendChild(makeChip(PINNED_TAGS[i]));
   var sc2 = document.getElementById('serie-chips-theme');
+  sc2.appendChild(makeChip('Sélection')); /* toujours en tête */
   for (i = 0; i < skeys.length; i++) sc2.appendChild(makeChip(skeys[i]));
 }
 
@@ -923,8 +946,8 @@ function clearFilters() {
   sClear(activeSeries); searchQuery = '';
   yearMin = YEAR_MIN; yearMax = YEAR_MAX; includeSansDate = true;
   var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
-  if (lo) { lo.value = YEAR_MIN; document.getElementById('yr-low-lbl').textContent = YEAR_MIN; }
-  if (hi) { hi.value = YEAR_MAX; document.getElementById('yr-high-lbl').textContent = YEAR_MAX; }
+  if (lo) { lo.value = YEAR_MIN; document.getElementById('yr-low-lbl').value = YEAR_MIN; }
+  if (hi) { hi.value = YEAR_MAX; document.getElementById('yr-high-lbl').value = YEAR_MAX; }
   var chk = document.getElementById('chk-sansdate'); if (chk) chk.checked = true;
   updateYearFill();
   var si = document.getElementById('search-input'); if (si) si.value = '';

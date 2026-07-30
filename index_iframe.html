@@ -109,9 +109,20 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 #lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:100;
   align-items:center;justify-content:center}
 #lb.open{display:flex}
-#lb img{max-width:90vw;max-height:90vh;object-fit:contain}
+#lb img{max-width:86vw;max-height:88vh;object-fit:contain;user-select:none}
 #lb-close{position:fixed;top:18px;right:22px;color:#888;font-size:26px;
   cursor:pointer;background:none;border:none}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,.12);border:none;color:#fff;font-size:28px;
+  width:48px;height:72px;cursor:pointer;border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;user-select:none;z-index:101}
+.lb-nav:hover{background:rgba(255,255,255,.28)}
+#lb-prev{left:10px}
+#lb-next{right:10px}
+#lb-caption{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,.55);font-size:11px;letter-spacing:.5px;
+  white-space:nowrap;pointer-events:none}
 
 /* ── LOADING ── */
 #loading{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;
@@ -175,11 +186,13 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 #tag-save-btn:disabled{opacity:.5;cursor:default}
 .tag-cancel-btn{background:none;border:1px solid var(--rule);color:var(--mid);
   padding:7px 16px;border-radius:3px;cursor:pointer;font-size:13px}
-.card-tag-edit{display:none;position:absolute;top:36px;right:8px;width:26px;height:26px;
+.card-tag-edit,.card-sheet-edit{display:none;position:absolute;right:8px;width:26px;height:26px;
   border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--rule);
   cursor:pointer;align-items:center;justify-content:center;font-size:13px;z-index:2;line-height:1}
-body.admin-on .card-tag-edit{display:flex}
-.card-tag-edit:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.card-tag-edit{top:36px}
+.card-sheet-edit{top:6px;font-size:11px;text-decoration:none;color:var(--ink)}
+body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit{display:flex}
+.card-tag-edit:hover,.card-sheet-edit:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
 #tag-new-row{display:flex;gap:6px;padding:8px 16px;border-top:1px solid var(--rule);flex-shrink:0}
 #tag-new-input{flex:1;border:1px solid var(--rule);border-radius:3px;
   padding:5px 8px;font-size:12px;font-family:inherit;outline:none}
@@ -261,6 +274,9 @@ body.admin-on .card-tag-edit{display:flex}
 <div id="lb">
   <img id="lb-img" src="" alt="">
   <button id="lb-close" onclick="closeLB()">&#x2715;</button>
+  <button class="lb-nav" id="lb-prev" onclick="lbNav(-1)">&#x2039;</button>
+  <button class="lb-nav" id="lb-next" onclick="lbNav(1)">&#x203a;</button>
+  <div id="lb-caption"></div>
 </div>
 
 <div id="tag-panel">
@@ -955,6 +971,7 @@ function renderGallery() {
   });
   var fc = document.getElementById('filter-count');
   if (fc) fc.textContent = filtered.length + ' / ' + ITEMS.length + ' ' + T('works');
+  lbItems = filtered;
   var grid = document.getElementById('grid'); grid.innerHTML = '';
   for (var i = 0; i < filtered.length; i++) {
     var it = filtered[i];
@@ -965,13 +982,13 @@ function renderGallery() {
       if (t) tagsHtml += '<span class="tag" onclick="addSerieFilter(\'' + esc(t) + '\')">' + esc(tagLabel(t)) + '</span>';
     }
     var tech = [it.technique ? techLabel(it.technique) : '', it.support ? supLabel(it.support) : ''].filter(Boolean).join(' / ');
-    var imgSafe = (it.image_url || '').replace(/'/g, '&#39;');
     var isSel = (it.serie || '').split('|').some(function(t) { return t.trim() === 'Sélection'; });
     var card = document.createElement('div'); card.className = 'card';
     card.innerHTML =
       '<div class="card-img"><img src="' + (it.image_url || '') + '" alt="' + esc(it.ref) + '"' +
-      ' onerror="this.style.display=\'none\'" onclick="openLB(\'' + imgSafe + '\')">' +
+      ' onerror="this.style.display=\'none\'" onclick="openLB(' + i + ')">' +
       (isSel ? '<span class="card-badge-sel">✦</span>' : '') + '</div>' +
+      '<a class="card-sheet-edit" href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + GID + '&range=A' + it._row + '" target="_blank" title="Ouvrir dans Sheets">✎</a>' +
       '<button class="card-tag-edit" onclick="openTagEditor(' + it._row + ')" title="Modifier les tags">🏷</button>' +
       '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
       '<div class="card-ref">' + esc(it.ref) + '</div>' +
@@ -1056,7 +1073,7 @@ function openTagEditor(row) {
 
 function openLBFromTag() {
   var img = document.getElementById('tag-drawer-img-el');
-  if (img && img.src) openLB(img.src);
+  if (img && img.src) openLBSrc(img.src);
 }
 
 function closeTagEditor() {
@@ -1178,17 +1195,47 @@ function checkAdmin() {
 }
 
 /* ── Lightbox ── */
-function openLB(src) {
-  if (!src) return;
-  document.getElementById('lb-img').src = src;
+var lbItems = [], lbIdx = -1;
+
+function openLB(idx) {
+  if (idx < 0 || idx >= lbItems.length) return;
+  lbIdx = idx;
+  var it = lbItems[lbIdx];
+  document.getElementById('lb-img').src = it.image_url || '';
+  document.getElementById('lb-img').alt = it.ref || '';
+  document.getElementById('lb-caption').textContent =
+    it.ref + (it.annee ? '  ·  ' + it.annee : '') +
+    '   ' + (lbIdx + 1) + ' / ' + lbItems.length;
+  document.getElementById('lb-prev').style.opacity = lbIdx > 0 ? '1' : '0.2';
+  document.getElementById('lb-next').style.opacity = lbIdx < lbItems.length - 1 ? '1' : '0.2';
   document.getElementById('lb').className = 'open';
   document.body.style.overflow = 'hidden';
+}
+function lbNav(dir) {
+  var next = lbIdx + dir;
+  if (next >= 0 && next < lbItems.length) openLB(next);
 }
 function closeLB() {
   document.getElementById('lb').className = '';
   document.body.style.overflow = '';
 }
-document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeLB(); });
+/* openLB depuis l'éditeur de tags (src directe, pas d'index) */
+function openLBSrc(src) {
+  if (!src) return;
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lb-img').alt = '';
+  document.getElementById('lb-caption').textContent = '';
+  document.getElementById('lb-prev').style.opacity = '0.2';
+  document.getElementById('lb-next').style.opacity = '0.2';
+  document.getElementById('lb').className = 'open';
+  document.body.style.overflow = 'hidden';
+}
+document.addEventListener('keydown', function(e) {
+  if (!document.getElementById('lb').classList.contains('open')) return;
+  if (e.key === 'Escape') closeLB();
+  else if (e.key === 'ArrowLeft')  lbNav(-1);
+  else if (e.key === 'ArrowRight') lbNav(1);
+});
 document.getElementById('lb').addEventListener('click', function(e) {
   if (e.target === document.getElementById('lb')) closeLB();
 });

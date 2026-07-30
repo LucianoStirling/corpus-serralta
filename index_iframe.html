@@ -35,6 +35,27 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
   flex-shrink:0;-webkit-tap-highlight-color:transparent}
 .chip:hover{border-color:var(--mid)}
 .chip.active{background:var(--ink);color:var(--white);border-color:var(--ink)}
+/* range slider années */
+.yr-range-wrap{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.yr-lbl{font-size:11px;color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums;
+  white-space:nowrap;min-width:30px;text-align:center}
+.yr-track-wrap{position:relative;flex:1;height:20px;display:flex;align-items:center}
+.yr-track{position:absolute;left:0;right:0;height:3px;background:var(--rule);border-radius:2px}
+.yr-fill{position:absolute;height:3px;background:var(--ink);border-radius:2px}
+.yr-track-wrap input[type=range]{position:absolute;width:100%;height:100%;margin:0;
+  background:transparent;-webkit-appearance:none;appearance:none;pointer-events:none}
+.yr-track-wrap input[type=range]::-webkit-slider-runnable-track{background:transparent}
+.yr-track-wrap input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;pointer-events:all;
+  width:14px;height:14px;border-radius:50%;background:var(--ink);cursor:pointer;
+  border:2px solid var(--white);box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.yr-track-wrap input[type=range]::-moz-range-track{background:transparent}
+.yr-track-wrap input[type=range]::-moz-range-thumb{pointer-events:all;width:14px;height:14px;
+  border-radius:50%;background:var(--ink);cursor:pointer;border:2px solid var(--white);
+  box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.sansdate-lbl{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--mid);
+  white-space:nowrap;cursor:pointer;flex-shrink:0;user-select:none}
+.sansdate-lbl input[type=checkbox]{accent-color:var(--ink);cursor:pointer;width:12px;height:12px}
+
 .filter-search-row{display:flex;align-items:center;gap:10px;padding:2px 0 4px}
 .filter-search{flex:1;border:1px solid var(--rule);border-radius:20px;
   padding:5px 14px;font-size:12px;font-family:inherit;color:var(--ink);
@@ -47,9 +68,12 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 /* ── GALERIE ── */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:2px;padding:2px}
 .card{background:var(--white);display:flex;flex-direction:column;position:relative}
-.card-img{overflow:hidden;background:#f0f0ee;cursor:zoom-in;aspect-ratio:3/2}
+.card-img{overflow:hidden;background:#f0f0ee;cursor:zoom-in;aspect-ratio:3/2;position:relative}
 .card-img img{width:100%;height:100%;display:block;transition:opacity .2s;object-fit:cover}
 .card-img img:hover{opacity:.9}
+.card-badge-sel{position:absolute;top:7px;right:7px;background:var(--accent);color:#fff;
+  font-size:9px;padding:2px 6px;border-radius:10px;letter-spacing:.5px;pointer-events:none;
+  font-weight:600;opacity:.92}
 .card-body{padding:8px 10px;flex:1;display:flex;flex-direction:column;gap:4px}
 .card-tags{display:flex;flex-wrap:wrap;gap:4px}
 .tag{font-size:10px;padding:2px 8px;border-radius:12px;background:#f0f0ec;color:var(--mid);
@@ -196,9 +220,22 @@ body.admin-on .card-tag-edit{display:flex}
 
 <div id="galerie-tab">
   <div class="filters">
-    <div class="filter-row">
+    <div class="filter-row" style="align-items:center;gap:6px;flex-wrap:wrap">
       <span class="filter-label" id="lbl-annees"></span>
-      <div class="filter-chips-scroll" id="year-chips"></div>
+      <div class="yr-range-wrap">
+        <span class="yr-lbl" id="yr-low-lbl"></span>
+        <div class="yr-track-wrap">
+          <div class="yr-track"></div>
+          <div class="yr-fill" id="yr-fill"></div>
+          <input type="range" id="yr-low" oninput="onYearLow()">
+          <input type="range" id="yr-high" oninput="onYearHigh()">
+        </div>
+        <span class="yr-lbl" id="yr-high-lbl"></span>
+      </div>
+      <label class="sansdate-lbl">
+        <input type="checkbox" id="chk-sansdate" onchange="onSansDateToggle()">
+        <span id="lbl-sansdate"></span>
+      </label>
     </div>
     <div class="filter-row">
       <span class="filter-label" style="font-size:9px" id="lbl-style"></span>
@@ -297,9 +334,11 @@ var LANG = {
     connecting:     'Connexion au catalogue…',
     loading_n:      'Chargement de {n} œuvres…',
     error:          'Impossible de charger le catalogue.',
+    lbl_sansdate:   'Sans date',
     /* Tags : clé FR = valeur affichée → pas de dict nécessaire, fallback sur la clé */
     tags: {},
     descs: {
+      'Sélection':             'Une centaine d\'œuvres choisies pour introduire le corpus : représentatives de chaque période, de chaque technique et de chaque registre. Point d\'entrée recommandé.',
       'Animaux':               'Chevaux, taureaux, oiseaux, chiens… Souvent en tension ou fusion avec le nu humain.',
       'Visages':               'Les visages où les détails sont travaillés avec précision, en opposition aux petits cercles qui anonymisent les figures dans les compositions denses.',
       'SCIENS-ART':            'Expression picturale du système cosmologique de Serralta. Cercles, grilles, diagrammes, une cartographie de forces invisibles issue de son livre fondateur, pensée comme langage universel.',
@@ -344,7 +383,9 @@ var LANG = {
     connecting:     'Conectando al catálogo…',
     loading_n:      'Cargando {n} obras…',
     error:          'Imposible cargar el catálogo.',
+    lbl_sansdate:   'Sin fecha',
     tags: {
+      'Sélection':             'Selección',
       'Animaux':               'Animales',
       'Visages':               'Rostros',
       'Musique':               'Música',
@@ -378,6 +419,7 @@ var LANG = {
       'Espagne':               'España'
     },
     descs: {
+      'Sélection':             'Un centenar de obras elegidas para introducir el corpus: representativas de cada período, cada técnica y cada registro. Punto de entrada recomendado.',
       'Animaux':               'Caballos, toros, pájaros, perros… A menudo en tensión o fusión con el desnudo humano.',
       'Visages':               'Rostros cuyos detalles están trabajados con precisión, en oposición a los pequeños círculos que anonimizan las figuras en las composiciones densas.',
       'SCIENS-ART':            'Expresión pictórica del sistema cosmológico de Serralta. Círculos, cuadrículas, diagramas, una cartografía de fuerzas invisibles surgida de su libro fundacional, concebida como lenguaje universal.',
@@ -422,7 +464,9 @@ var LANG = {
     connecting:     'Connecting…',
     loading_n:      'Loading {n} works…',
     error:          'Unable to load catalogue.',
+    lbl_sansdate:   'Undated',
     tags: {
+      'Sélection':             'Selection',
       'Animaux':               'Animals',
       'Visages':               'Faces',
       'Musique':               'Music',
@@ -452,6 +496,7 @@ var LANG = {
       'Espagne':               'Spain'
     },
     descs: {
+      'Sélection':             'Around a hundred works chosen to introduce the corpus: representative of each period, technique and register. Recommended entry point.',
       'Animaux':               'Horses, bulls, birds, dogs… Often in tension or fusion with the human nude.',
       'Visages':               'Faces in which details are rendered with precision, as opposed to the small circles that anonymise figures in dense compositions.',
       'SCIENS-ART':            'Pictorial expression of Serralta’s cosmological system. Circles, grids, diagrams — a mapping of invisible forces drawn from his founding book, conceived as a universal language.',
@@ -508,8 +553,9 @@ var VALID_NAMES = ['anita','jorge','anahi','roberto','luciano','mogdad','maora',
 var API_BASE = 'https://script.google.com/macros/s/AKfycbynIlYJAqtlbRoEkRx5-stkV2BQLuOfzCltkGFBU874IpZr2F5CxVVzS_Peymvah68z/exec';
 var API_URL  = API_BASE + '?api=1';
 var ITEMS = [], SHEET_ID = '', GID = '', APP_VERSION = '';
-var activeYears = {}, activeSeries = {}, searchQuery = '';
-var PINNED_TAGS = ['Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
+var activeSeries = {}, searchQuery = '';
+var YEAR_MIN = 0, YEAR_MAX = 0, yearMin = 0, yearMax = 0, includeSansDate = true;
+var PINNED_TAGS = ['Sélection', 'Couleur', 'Noir et Blanc', 'Diapo-Photo', 'Martelés', 'Sculptures', 'Supports Divers'];
 var SANS_TAG_KEY = '__aucun__';
 
 /* ── Helpers généraux ── */
@@ -555,6 +601,33 @@ var CHRONO_YRS = [
     {fr:'France · Jullouville — Retraite', es:'Francia · Jullouville — Jubilación', en:'France · Jullouville — Retirement'}]
 ];
 
+/* ── Cache localStorage (stale-while-revalidate) ── */
+var CACHE_KEY = 'corpus_serralta_cache_v1';
+
+function parseItems(raw) {
+  return raw.map(function(a) {
+    return { ref:a[0], annee:a[1], technique:a[2], support:a[3],
+             serie:a[4], ico:a[5], crit:a[6], image_url:a[7], _row:a[8] };
+  });
+}
+
+function loadCache() {
+  try {
+    var s = localStorage.getItem(CACHE_KEY);
+    if (!s) return null;
+    return JSON.parse(s);
+  } catch(e) { return null; }
+}
+
+function saveCache(resp) {
+  try { localStorage.setItem(CACHE_KEY, JSON.stringify(resp)); } catch(e) {}
+}
+
+function applyResp(resp) {
+  ITEMS = parseItems(resp.items);
+  SHEET_ID = resp.sheetId; GID = resp.gid; APP_VERSION = resp.version || '';
+}
+
 /* ── Startup ── */
 document.addEventListener('DOMContentLoaded', startApp);
 
@@ -562,23 +635,33 @@ function startApp() {
   document.documentElement.lang = lang;
   var msg = document.getElementById('load-msg');
   var sub = document.getElementById('load-sub');
-  if (msg) msg.textContent = T('loading');
-  if (sub) sub.textContent = T('connecting');
-  fetch(API_URL)
-    .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
-    .then(function(resp) {
-      if (msg) msg.textContent = Tn('loading_n', resp.items.length);
-      ITEMS = resp.items.map(function(a) {
-        return { ref:a[0], annee:a[1], technique:a[2], support:a[3],
-                 serie:a[4], ico:a[5], crit:a[6], image_url:a[7], _row:a[8] };
+
+  var cached = loadCache();
+  if (cached) {
+    /* Affichage immédiat depuis le cache */
+    applyResp(cached);
+    init();
+    /* Refresh silencieux en arrière-plan */
+    fetch(API_URL)
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(resp) { saveCache(resp); })
+      .catch(function() {});
+  } else {
+    /* Première visite : spinner + fetch */
+    if (msg) msg.textContent = T('loading');
+    if (sub) sub.textContent = T('connecting');
+    fetch(API_URL)
+      .then(function(r) { if (!r.ok) throw new Error('HTTP ' + r.status); return r.json(); })
+      .then(function(resp) {
+        saveCache(resp);
+        applyResp(resp);
+        init();
+      })
+      .catch(function(err) {
+        if (msg) { msg.className = 'err-msg'; msg.textContent = T('error'); }
+        if (sub) sub.textContent = err.message;
       });
-      SHEET_ID = resp.sheetId; GID = resp.gid; APP_VERSION = resp.version || '';
-      init();
-    })
-    .catch(function(err) {
-      if (msg) { msg.className = 'err-msg'; msg.textContent = T('error'); }
-      if (sub) sub.textContent = err.message;
-    });
+  }
 }
 
 function init() {
@@ -592,8 +675,15 @@ function init() {
   document.getElementById('lbl-series').textContent     = T('lbl_series');
   document.getElementById('search-input').placeholder   = T('search_ph');
   document.getElementById('clear-btn').textContent      = T('btn_clear');
+  document.getElementById('lbl-sansdate').textContent   = T('lbl_sansdate');
   buildFilterChips();
+  /* Sélection active par défaut */
+  sAdd(activeSeries, 'Sélection');
+  document.querySelectorAll('#serie-chips-class .chip').forEach(function(c) {
+    if (c.getAttribute('data-s') === 'Sélection') c.className = 'chip active';
+  });
   buildCollections();
+  enforceMinFilter();
   renderGallery();
 }
 
@@ -705,32 +795,79 @@ function switchMainTab(tab) {
 }
 
 function openGallery(years, series) {
-  activeYears = sFromArr(years); activeSeries = sFromArr(series);
+  activeSeries = sFromArr(series);
   switchMainTab('galerie');
-  document.querySelectorAll('#year-chips .chip').forEach(function(c) {
-    c.className = sHas(activeYears, c.getAttribute('data-y')) ? 'chip active' : 'chip';
-  });
+  // Set year range from provided years array
+  var numYears = (years || []).map(function(y) { return parseInt(y); }).filter(function(y) { return !isNaN(y); });
+  if (numYears.length) {
+    yearMin = Math.min.apply(null, numYears);
+    yearMax = Math.max.apply(null, numYears);
+  } else {
+    yearMin = YEAR_MIN; yearMax = YEAR_MAX;
+  }
+  var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
+  if (lo) { lo.value = yearMin; document.getElementById('yr-low-lbl').textContent = yearMin; }
+  if (hi) { hi.value = yearMax; document.getElementById('yr-high-lbl').textContent = yearMax; }
+  updateYearFill();
   document.querySelectorAll('#serie-chips-class .chip, #serie-chips-theme .chip').forEach(function(c) {
     c.className = sHas(activeSeries, c.getAttribute('data-s')) ? 'chip active' : 'chip';
   });
   enforceMinFilter(); renderGallery(); window.scrollTo(0, 0);
 }
 
+/* ── Slider années ── */
+function buildYearSlider() {
+  var i, nums = [];
+  for (i = 0; i < ITEMS.length; i++) {
+    var n = parseInt(ITEMS[i].annee);
+    if (!isNaN(n)) nums.push(n);
+  }
+  if (!nums.length) return;
+  YEAR_MIN = Math.min.apply(null, nums);
+  YEAR_MAX = Math.max.apply(null, nums);
+  yearMin = YEAR_MIN; yearMax = YEAR_MAX;
+  var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
+  lo.min = hi.min = YEAR_MIN; lo.max = hi.max = YEAR_MAX;
+  lo.value = YEAR_MIN; hi.value = YEAR_MAX;
+  document.getElementById('yr-low-lbl').textContent  = YEAR_MIN;
+  document.getElementById('yr-high-lbl').textContent = YEAR_MAX;
+  document.getElementById('chk-sansdate').checked = true;
+  updateYearFill();
+}
+function updateYearFill() {
+  var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
+  var fill = document.getElementById('yr-fill');
+  if (!lo || !hi || !fill) return;
+  var range = YEAR_MAX - YEAR_MIN;
+  if (!range) return;
+  var left  = (yearMin  - YEAR_MIN) / range * 100;
+  var right = (YEAR_MAX - yearMax)  / range * 100;
+  fill.style.left  = left  + '%';
+  fill.style.right = right + '%';
+}
+function onYearLow() {
+  var lo = document.getElementById('yr-low');
+  yearMin = Math.min(parseInt(lo.value), yearMax);
+  lo.value = yearMin;
+  document.getElementById('yr-low-lbl').textContent = yearMin;
+  updateYearFill(); enforceMinFilter(); renderGallery();
+}
+function onYearHigh() {
+  var hi = document.getElementById('yr-high');
+  yearMax = Math.max(parseInt(hi.value), yearMin);
+  hi.value = yearMax;
+  document.getElementById('yr-high-lbl').textContent = yearMax;
+  updateYearFill(); enforceMinFilter(); renderGallery();
+}
+function onSansDateToggle() {
+  includeSansDate = document.getElementById('chk-sansdate').checked;
+  enforceMinFilter(); renderGallery();
+}
+
 /* ── Chips filtres ── */
 function buildFilterChips() {
-  var i, ymap = {}, years = [];
-  for (i = 0; i < ITEMS.length; i++) {
-    var yr = String(ITEMS[i].annee);
-    if (!ymap[yr]) { ymap[yr] = true; years.push(yr); }
-  }
-  years.sort();
-  var yc = document.getElementById('year-chips');
-  for (i = 0; i < years.length; i++) {
-    var yb = document.createElement('button');
-    yb.className = 'chip'; yb.setAttribute('data-y', years[i]); yb.textContent = years[i];
-    (function(y, b) { b.onclick = function() { toggleYear(y, b); }; })(years[i], yb);
-    yc.appendChild(yb);
-  }
+  var i;
+  buildYearSlider();
   var scount2 = {};
   for (i = 0; i < ITEMS.length; i++) {
     var pts = (ITEMS[i].serie || '').split('|');
@@ -755,23 +892,25 @@ function buildFilterChips() {
   for (i = 0; i < skeys.length; i++) sc2.appendChild(makeChip(skeys[i]));
 }
 
-function toggleYear(y, btn) {
-  if (sHas(activeYears, y)) { sDel(activeYears, y); btn.className = 'chip'; }
-  else { sAdd(activeYears, y); btn.className = 'chip active'; }
-  enforceMinFilter(); renderGallery();
-}
 function toggleSerie(s, btn) {
   if (sHas(activeSeries, s)) { sDel(activeSeries, s); btn.className = 'chip'; }
   else { sAdd(activeSeries, s); btn.className = 'chip active'; }
   enforceMinFilter(); renderGallery();
 }
 function enforceMinFilter() {
-  var active = sSize(activeYears) > 0 || sSize(activeSeries) > 0 || searchQuery.length > 0;
+  var yearFiltered = yearMin > YEAR_MIN || yearMax < YEAR_MAX;
+  var active = yearFiltered || !includeSansDate || sSize(activeSeries) > 0 || searchQuery.length > 0;
   document.getElementById('clear-btn').style.display = active ? 'inline' : 'none';
 }
 function onSearch(val) { searchQuery = val.trim().toLowerCase(); enforceMinFilter(); renderGallery(); }
 function clearFilters() {
-  sClear(activeYears); sClear(activeSeries); searchQuery = '';
+  sClear(activeSeries); searchQuery = '';
+  yearMin = YEAR_MIN; yearMax = YEAR_MAX; includeSansDate = true;
+  var lo = document.getElementById('yr-low'), hi = document.getElementById('yr-high');
+  if (lo) { lo.value = YEAR_MIN; document.getElementById('yr-low-lbl').textContent = YEAR_MIN; }
+  if (hi) { hi.value = YEAR_MAX; document.getElementById('yr-high-lbl').textContent = YEAR_MAX; }
+  var chk = document.getElementById('chk-sansdate'); if (chk) chk.checked = true;
+  updateYearFill();
   var si = document.getElementById('search-input'); if (si) si.value = '';
   document.querySelectorAll('.chip').forEach(function(c) { c.className = 'chip'; });
   enforceMinFilter(); renderGallery();
@@ -779,12 +918,16 @@ function clearFilters() {
 
 /* ── Filtrage + rendu ── */
 function filterItems() {
-  var noYear = !sSize(activeYears), noSerie = !sSize(activeSeries), noSearch = !searchQuery;
-  if (noYear && noSerie && noSearch) return ITEMS;
+  var yearFiltered = yearMin > YEAR_MIN || yearMax < YEAR_MAX;
+  var noSerie = !sSize(activeSeries), noSearch = !searchQuery;
+  var allPass = !yearFiltered && includeSansDate && noSerie && noSearch;
+  if (allPass) return ITEMS;
   var result = [], i;
   for (i = 0; i < ITEMS.length; i++) {
     var it = ITEMS[i];
-    var yearOk = noYear || sHas(activeYears, String(it.annee));
+    var yr = parseInt(it.annee);
+    var isSansDate = isNaN(yr);
+    var yearOk = isSansDate ? includeSansDate : (yr >= yearMin && yr <= yearMax);
     var serieOk = noSerie;
     if (!serieOk) {
       serieOk = true;
@@ -823,10 +966,12 @@ function renderGallery() {
     }
     var tech = [it.technique ? techLabel(it.technique) : '', it.support ? supLabel(it.support) : ''].filter(Boolean).join(' / ');
     var imgSafe = (it.image_url || '').replace(/'/g, '&#39;');
+    var isSel = (it.serie || '').split('|').some(function(t) { return t.trim() === 'Sélection'; });
     var card = document.createElement('div'); card.className = 'card';
     card.innerHTML =
       '<div class="card-img"><img src="' + (it.image_url || '') + '" alt="' + esc(it.ref) + '"' +
-      ' onerror="this.style.display=\'none\'" onclick="openLB(\'' + imgSafe + '\')"></div>' +
+      ' onerror="this.style.display=\'none\'" onclick="openLB(\'' + imgSafe + '\')">' +
+      (isSel ? '<span class="card-badge-sel">✦</span>' : '') + '</div>' +
       '<button class="card-tag-edit" onclick="openTagEditor(' + it._row + ')" title="Modifier les tags">🏷</button>' +
       '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
       '<div class="card-ref">' + esc(it.ref) + '</div>' +
@@ -1020,6 +1165,7 @@ function checkAdmin() {
   if (VALID_NAMES.indexOf(input) !== -1) {
     ADMIN_NAME = input.charAt(0).toUpperCase() + input.slice(1);
     adminMode = true;
+    try { localStorage.removeItem(CACHE_KEY); } catch(e) {}
     document.body.classList.add('admin-on');
     var lb = document.getElementById('lock-btn');
     lb.classList.add('unlocked'); lb.title = ADMIN_NAME + ' connecté·e';

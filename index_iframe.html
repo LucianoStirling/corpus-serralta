@@ -192,13 +192,18 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 #tag-save-btn:disabled{opacity:.5;cursor:default}
 .tag-cancel-btn{background:none;border:1px solid var(--rule);color:var(--mid);
   padding:7px 16px;border-radius:3px;cursor:pointer;font-size:13px}
-.card-tag-edit,.card-sheet-edit{display:none;position:absolute;right:8px;width:26px;height:26px;
+.card-tag-edit,.card-sheet-edit,.card-sel-toggle{display:none;position:absolute;right:8px;width:26px;height:26px;
   border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--rule);
   cursor:pointer;align-items:center;justify-content:center;font-size:13px;z-index:2;line-height:1}
 .card-tag-edit{top:36px}
 .card-sheet-edit{top:6px;font-size:11px;text-decoration:none;color:var(--ink)}
-body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit{display:flex}
+.card-sel-toggle{top:66px;font-size:14px;transition:background .12s,color .12s,border-color .12s}
+body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit,body.admin-on .card-sel-toggle{display:flex}
 .card-tag-edit:hover,.card-sheet-edit:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.card-sel-toggle.sel-on{background:#f5c800;border-color:#d4a900;color:#1a1a1a}
+.card-sel-toggle:not(.sel-on):hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.card-sel-toggle.sel-on:hover{background:#e6b000;border-color:#c49800}
+.card-sel-toggle.sel-saving{opacity:.45;cursor:wait;pointer-events:none}
 #tag-new-row{display:flex;gap:6px;padding:8px 16px;border-top:1px solid var(--rule);flex-shrink:0}
 #tag-new-input{flex:1;border:1px solid var(--rule);border-radius:3px;
   padding:5px 8px;font-size:12px;font-family:inherit;outline:none}
@@ -1207,6 +1212,7 @@ function renderGallery() {
       (isSel ? '<span class="card-badge-sel">' + tagLabel('Sélection') + ' ✦</span>' : '') + '</div>' +
       '<a class="card-sheet-edit" href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + GID + '&range=A' + it._row + '" target="_blank" title="Ouvrir dans Sheets">✎</a>' +
       '<button class="card-tag-edit" onclick="openTagEditor(' + it._row + ')" title="Modifier les tags">🏷</button>' +
+      '<button class="card-sel-toggle' + (isSel ? ' sel-on' : '') + '" onclick="toggleSel(' + it._row + ',event)" title="' + (isSel ? 'Retirer de la sélection' : 'Ajouter à la sélection') + '">✦</button>' +
       '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
       '<div class="card-ref">' + esc(it.ref) + '</div>' +
       (tech ? '<div class="card-tech">' + esc(tech) + '</div>' : '') +
@@ -1325,6 +1331,39 @@ function saveTagEditor() {
   };
   script.onerror = function() { btn.textContent = 'Erreur'; btn.disabled = false; };
   script.src = API_BASE + '?action=updateTags&token=' + encodeURIComponent(ADMIN_NAME) + '&row=' + tagEditorRow + '&tags=' + tagsParam + '&callback=' + cbName;
+  document.head.appendChild(script);
+}
+
+function toggleSel(row, evt) {
+  if (!adminMode || !ADMIN_NAME) return;
+  if (evt) { evt.stopPropagation(); evt.preventDefault(); }
+  var item = null;
+  for (var i = 0; i < ITEMS.length; i++) { if (ITEMS[i]._row === row) { item = ITEMS[i]; break; } }
+  if (!item) return;
+  /* Feedback immédiat sur le bouton */
+  var btn = document.querySelector('.card-sel-toggle[onclick*="toggleSel(' + row + ',"]');
+  if (btn) btn.classList.add('sel-saving');
+  var tags = (item.serie || '').split('|').map(function(s){ return s.trim(); }).filter(Boolean);
+  var idx = tags.indexOf('Sélection');
+  if (idx !== -1) { tags.splice(idx, 1); } else { tags.push('Sélection'); }
+  var tagsParam = encodeURIComponent(tags.join('|'));
+  var cbName = '_ts' + row + '_' + Date.now();
+  var script = document.createElement('script');
+  window[cbName] = function(data) {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (!data.ok) { if (btn) btn.classList.remove('sel-saving'); return; }
+    for (var j = 0; j < ITEMS.length; j++) {
+      if (ITEMS[j]._row === row) { ITEMS[j].serie = data.serie; break; }
+    }
+    renderGallery();
+  };
+  script.onerror = function() {
+    delete window[cbName];
+    if (script.parentNode) script.parentNode.removeChild(script);
+    if (btn) btn.classList.remove('sel-saving');
+  };
+  script.src = API_BASE + '?action=updateTags&token=' + encodeURIComponent(ADMIN_NAME) + '&row=' + row + '&tags=' + tagsParam + '&callback=' + cbName;
   document.head.appendChild(script);
 }
 

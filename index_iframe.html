@@ -15,7 +15,7 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 
 /* ── NAV ── */
 #main-nav{display:flex;border-bottom:1px solid var(--rule);background:var(--bg);
-  position:sticky;top:0;z-index:20;height:var(--nav-h);align-items:stretch;overflow:hidden}
+  position:sticky;top:0;z-index:20;height:var(--nav-h);align-items:stretch}
 .main-tab{flex:1;height:100%;font-size:13px;cursor:pointer;color:var(--mid);
   border:none;border-radius:0;background:transparent;
   transition:background .15s,color .15s;font-family:inherit;letter-spacing:.01em}
@@ -76,9 +76,9 @@ body{font-family:'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:va
 .card-img{overflow:hidden;background:#f0f0ee;cursor:zoom-in;aspect-ratio:3/2;position:relative}
 .card-img img{width:100%;height:100%;display:block;transition:opacity .2s;object-fit:cover}
 .card-img img:hover{opacity:.9}
-.card-badge-sel{position:absolute;top:7px;right:7px;background:var(--accent);color:#fff;
-  font-size:9px;padding:2px 6px;border-radius:10px;letter-spacing:.5px;pointer-events:none;
-  font-weight:600;opacity:.92}
+.card-badge-sel{position:absolute;top:7px;right:7px;background:#f5c800;color:#1a1a1a;
+  font-size:10px;padding:3px 8px;border-radius:4px;letter-spacing:.01em;pointer-events:none;
+  font-weight:600;white-space:nowrap}
 .card-body{padding:8px 10px;flex:1;display:flex;flex-direction:column;gap:4px}
 .card-tags{display:flex;flex-wrap:wrap;gap:4px}
 .tag{font-size:10px;padding:2px 8px;border-radius:12px;background:#f0f0ec;color:var(--mid);
@@ -220,12 +220,17 @@ body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit{display:flex}
     background:var(--white);border-bottom:1px solid var(--rule);
     position:sticky;top:var(--nav-h);z-index:19}
   .mobile-bar-btn{
-    flex:1;padding:7px 10px;font-size:12px;font-family:inherit;
+    flex:1;min-width:0;padding:7px 10px;font-size:12px;font-family:inherit;
     background:var(--white);border:1px solid var(--rule);border-radius:4px;
     cursor:pointer;color:var(--ink);text-align:center;
-    -webkit-tap-highlight-color:transparent}
+    -webkit-tap-highlight-color:transparent;
+    display:flex;align-items:center;justify-content:center;gap:5px}
   .mobile-bar-btn:active{background:var(--bg)}
-  .mobile-filter-count{font-size:10px;color:var(--accent);white-space:nowrap;flex-shrink:0}
+  .mobile-filter-count{
+    display:none;background:var(--accent);color:#fff;
+    font-size:9px;font-weight:600;line-height:16px;
+    min-width:16px;height:16px;border-radius:8px;
+    padding:0 4px;text-align:center;flex-shrink:0}
 
   /* Filters panel → modal plein écran */
   #filters-panel{
@@ -297,9 +302,11 @@ body.admin-on .card-tag-edit,body.admin-on .card-sheet-edit{display:flex}
 <div id="galerie-tab">
   <!-- Barre déclencheur mobile (cachée sur desktop) -->
   <div class="mobile-bar" id="mobile-bar">
-    <button class="mobile-bar-btn" onclick="openFilterModal(false)" id="mobile-filtrer-btn">Filtrer ▾</button>
+    <button class="mobile-bar-btn" onclick="openFilterModal(false)" id="mobile-filtrer-btn">
+      <span id="lbl-mobile-filtrer-txt">Filtrer ▾</span>
+      <span class="mobile-filter-count" id="mobile-filter-count"></span>
+    </button>
     <button class="mobile-bar-btn" onclick="openFilterModal(true)" id="mobile-rechercher-btn">Rechercher 🔍</button>
-    <span class="mobile-filter-count" id="mobile-filter-count"></span>
   </div>
 
   <div class="filters" id="filters-panel">
@@ -701,7 +708,13 @@ function updateMobileFilterBadge() {
   if (!badge) return;
   var yearFiltered = (YEAR_MIN && YEAR_MAX) ? (yearMin > YEAR_MIN || yearMax < YEAR_MAX) : false;
   var n = sSize(activeSeries) + (yearFiltered ? 1 : 0) + (searchQuery ? 1 : 0);
-  badge.textContent = n > 0 ? n + ' filtre' + (n > 1 ? 's' : '') : '';
+  if (n > 0) {
+    badge.textContent = n;
+    badge.style.display = 'inline-block';
+  } else {
+    badge.textContent = '';
+    badge.style.display = 'none';
+  }
 }
 
 /* ── Modal filtre mobile ── */
@@ -860,7 +873,7 @@ function init() {
   el = document.getElementById('lbl-filtrer-modal');    if(el) el.textContent = T('lbl_filtrer_modal');
   el = document.getElementById('filter-efface-btn');    if(el) el.textContent = T('btn_efface_filtres');
   el = document.getElementById('filter-apply-btn');     if(el) el.textContent = T('btn_appliquer');
-  el = document.getElementById('mobile-filtrer-btn');   if(el) el.textContent = T('lbl_mobile_filtrer') + ' ▾';
+  el = document.getElementById('lbl-mobile-filtrer-txt'); if(el) el.textContent = T('lbl_mobile_filtrer') + ' ▾';
   el = document.getElementById('mobile-rechercher-btn');if(el) el.textContent = T('lbl_mobile_rechercher') + ' 🔍';
   buildFilterChips();
   /* Sélection active par défaut */
@@ -1191,7 +1204,7 @@ function renderGallery() {
     card.innerHTML =
       '<div class="card-img"><img src="' + (it.image_url || '') + '" alt="' + esc(it.ref) + '"' +
       ' onerror="this.style.display=\'none\'" onclick="openLB(' + i + ')">' +
-      (isSel ? '<span class="card-badge-sel">✦</span>' : '') + '</div>' +
+      (isSel ? '<span class="card-badge-sel">' + tagLabel('Sélection') + ' ✦</span>' : '') + '</div>' +
       '<a class="card-sheet-edit" href="https://docs.google.com/spreadsheets/d/' + SHEET_ID + '/edit#gid=' + GID + '&range=A' + it._row + '" target="_blank" title="Ouvrir dans Sheets">✎</a>' +
       '<button class="card-tag-edit" onclick="openTagEditor(' + it._row + ')" title="Modifier les tags">🏷</button>' +
       '<div class="card-body"><div class="card-tags">' + tagsHtml + '</div>' +
